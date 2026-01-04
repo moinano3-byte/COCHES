@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Generador de Cuadrantes</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body class="modo-menu">
+
+  <!-- ===== MENÚ PRINCIPAL ===== -->
+  <div id="menu-config">
+
+    <!-- BOTÓN AÑO -->
+    <div class="bloque-menu">
+      <button type="button" class="btn-menu" id="btn-anio" style="text-align: center;">
+        AÑO
+      </button>
+      <div id="submenu-anio" class="submenu" style="display:none; flex-direction: column; gap:5px; margin-top:10px; width:100%;">
+        <label>
+          Selecciona año:
+          <select id="cfg-anio"></select>
+        </label>
+      </div>
+    </div>
+
+    <!-- BOTÓN UBICACIONES -->
+    <div class="bloque-menu">
+      <button type="button" class="btn-menu" id="btn-zonas">
+        🗺️ UBICACIONES
+      </button>
+    </div>
+
+    <!-- BOTÓN FESTIVOS -->
+    <div class="bloque-menu">
+      <button type="button" class="btn-menu" id="btn-findes">
+        🎉 FINES DE SEMANA Y FESTIVOS
+      </button>
+    </div>
+
+    <!-- BOTÓN PREFERENCIAS -->
+    <div class="bloque-menu">
+      <button type="button" class="btn-menu" id="btn-preferencias">
+        ⚙️ PREFERENCIAS
+      </button>
+      <div class="submenu" id="submenu-preferencias">
+        <label>
+          Zona preferente:
+          <select id="zonaIntervencion">
+            <option value="todas">Sin preferencias</option>
+            <option value="zona1">Zona 1</option>
+            <option value="zona2">Zona 2</option>
+            <option value="zona3">Zona 3</option>
+            <option value="zona4">Zona 4</option>
+            <option value="zona5">Zona 5</option>
+          </select>
+        </label>
+      </div>
+    </div>
+
+    <!-- BOTÓN GENERAR CUADRANTE -->
+    <div class="bloque-menu">
+      <button type="button" id="btn-generar">GENERAR CUADRANTE</button>
+    </div>
+  </div>
+
+  <!-- ===== PANTALLA FESTIVOS ===== -->
+  <div id="pantalla-findes-festivos" style="display:none; flex-direction: column; align-items: center; gap: 20px; padding: 35px 45px; background: #ffffff; border-radius: 18px; box-shadow: 0 15px 40px rgba(0,0,0,0.15); min-width: 420px; max-width: 520px; margin: auto; text-align: center;">
+    <h2>Festivos</h2>
+
+    <label>
+      ¿Se trabajan fines de semana?
+      <select id="cfg-findes-pantalla">
+        <option value="si">Sí</option>
+        <option value="no">No</option>
+      </select>
+    </label>
+
+    <label>
+      ¿Se trabajan festivos?
+      <select id="cfg-festivos-pantalla">
+        <option value="si">Sí</option>
+        <option value="no">No</option>
+      </select>
+    </label>
+
+    <div id="festivos-fechas" style="display:none; flex-direction: column; gap:5px; margin-top:10px; width:100%;">
+      <p>Seleccione los Festivos anuales:</p>
+      <div id="lista-fechas"></div>
+      <button type="button" id="agregar-fecha" class="btn-menu" style="width:50%; align-self:center;">
+        Añadir Fecha
+      </button>
+    </div>
+
+    <div style="display:flex; gap:10px; margin-top:20px;">
+      <button id="guardar-findes-festivos" class="btn-menu" style="background:#70AD47; color:white;">Guardar</button>
+      <button id="volver-findes-festivos" class="btn-menu" style="background:#aaa; color:white;">Volver</button>
+    </div>
+  </div>
+
+  <!-- ===== PANTALLA DE ZONAS ===== -->
+  <div id="pantalla-zonas">
+    <h2>Definir Zonas</h2>
+
+    <label>
+      Número de zonas:
+      <select id="cfg-zonas">
+        <option value="1">1</option>
+        <option value="2">2</option>
+        <option value="3">3</option>
+        <option value="4">4</option>
+        <option value="5">5</option>
+      </select>
+    </label>
+
+    <div id="nombres-zonas"></div>
+
+    <div style="display:flex; gap: 10px; margin-top: 20px;">
+      <button id="guardar-zonas">Guardar</button>
+      <button id="volver-menu">Volver</button>
+    </div>
+  </div>
+
+  <!-- ===== TABLA DEL CUADRANTE ===== -->
+  <table id="cuadrante">
+    <tbody></tbody>
+  </table>
+
+  <!-- ===== BOTONES MÓVIL (AÑADIDO) ===== -->
+  <div id="acciones-movil">
+    <button data-estado="2">👤</button>
+    <button data-estado="3">🚗</button>
+    <button data-estado="0">❌</button>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
