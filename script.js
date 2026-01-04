@@ -1136,12 +1136,11 @@ function ocultarAccionesMovil() {
 
 /* Seleccionar rectángulo de celdas */
 function seleccionarRectangulo(tdFin, mantener = false) {
-  if (!celdaInicio) return;
+  if (!celdaInicio || !tdFin) return;
   if (!mantener) limpiarSeleccion();
 
   const filaIni = celdaInicio.parentElement.rowIndex;
   const filaFin = tdFin.parentElement.rowIndex;
-
   const colIni = celdaInicio.cellIndex;
   const colFin = tdFin.cellIndex;
 
@@ -1164,45 +1163,62 @@ function seleccionarRectangulo(tdFin, mantener = false) {
   }
 }
 
+
 /* =========================================================
-   SELECCIÓN CON RATÓN
+   SELECCIÓN CON RATÓN MEJORADA (mantener selección al soltar)
 ========================================================= */
 tbody.addEventListener("mousedown", e => {
   const td = e.target.closest("td");
   if (!esSeleccionable(td)) return;
 
+  // Si no se pulsa Ctrl, limpiar selección anterior
   if (!e.ctrlKey) limpiarSeleccion();
 
   celdaInicio = td;
   arrastrando = false;
 
-  if (e.ctrlKey) {
-    seleccionarRectangulo(td, true);
-    e.preventDefault();
-  }
+  // Marcamos la celda inicial
+  td.classList.add("seleccionada");
+  seleccion.add(td);
+
+  e.preventDefault(); // evita seleccionar texto accidentalmente
 });
 
 tbody.addEventListener("mousemove", e => {
-  const td = e.target.closest("td");
-  if (!celdaInicio || !esSeleccionable(td)) return;
+  if (!celdaInicio) return;
 
-  arrastrando = true;
-  seleccionarRectangulo(td, e.ctrlKey);
-});
-
-tbody.addEventListener("mouseup", e => {
   const td = e.target.closest("td");
   if (!esSeleccionable(td)) return;
 
+  arrastrando = true;
+
+  // Limpiar selección solo si no se pulsa Ctrl (mantener selección previa)
+  if (!e.ctrlKey) limpiarSeleccion();
+  seleccionarRectangulo(td, true);
+});
+
+tbody.addEventListener("mouseup", e => {
+  if (!celdaInicio) return;
+
+  const td = e.target.closest("td");
+  if (!td || !esSeleccionable(td)) {
+    celdaInicio = null;
+    arrastrando = false;
+    return;
+  }
+
   if (!arrastrando && !e.ctrlKey) {
+    // Click simple: cambia estado de la celda
     td.dataset.estado = (Number(td.dataset.estado) + 1) % estados.length;
     renderEstado(td);
     recalcular();
   }
 
+  // No limpiamos la selección para poder usar teclas
   celdaInicio = null;
   arrastrando = false;
 });
+
 
 /* =========================================================
    SELECCIÓN TÁCTIL (MÓVIL)
@@ -1215,32 +1231,30 @@ tbody.addEventListener("touchstart", e => {
   arrastrando = false;
   modoSeleccionMovil = false;
 
+  // Solo iniciar timer para menú si hacemos "tap largo"
   touchTimer = setTimeout(() => {
     modoSeleccionMovil = true;
     limpiarSeleccion();
-
     td.classList.add("seleccionada");
     seleccion.add(td);
-
-    const touch = e.touches[0];
-    mostrarAccionesMovil(touch.clientX, touch.clientY);
+    // NO mostrar menú aún, lo haremos en touchend
   }, 300);
 }, { passive: true });
 
 tbody.addEventListener("touchmove", e => {
-  if (!modoSeleccionMovil || !celdaInicio) return;
-
-  e.preventDefault();
+  if (!celdaInicio) return;
 
   const touch = e.touches[0];
   const elem = document.elementFromPoint(touch.clientX, touch.clientY);
   const td = elem?.closest("td");
-
   if (!esSeleccionable(td)) return;
 
   arrastrando = true;
+
   seleccionarRectangulo(td, true);
-  mostrarAccionesMovil(touch.clientX, touch.clientY);
+
+  // Bloquear scroll mientras arrastramos
+  e.preventDefault();
 }, { passive: false });
 
 tbody.addEventListener("touchend", e => {
@@ -1248,11 +1262,11 @@ tbody.addEventListener("touchend", e => {
 
   const touch = e.changedTouches[0];
 
-  if (modoSeleccionMovil && seleccion.size > 0) {
-    mostrarAccionesMovil(touch.clientX, touch.clientY);
-  }
-
-  if (!modoSeleccionMovil && !arrastrando && celdaInicio) {
+  if (modoSeleccionMovil || arrastrando) {
+    // Mostramos menú SOLO al final del arrastre
+    if (seleccion.size > 0) mostrarAccionesMovil(touch.clientX, touch.clientY);
+  } else if (celdaInicio) {
+    // Si solo fue tap corto sin arrastrar
     celdaInicio.dataset.estado = (Number(celdaInicio.dataset.estado) + 1) % estados.length;
     renderEstado(celdaInicio);
     recalcular();
@@ -1262,6 +1276,7 @@ tbody.addEventListener("touchend", e => {
   arrastrando = false;
   modoSeleccionMovil = false;
 });
+
 
 /* =========================================================
    TECLAS PARA CAMBIAR ESTADO
