@@ -312,14 +312,14 @@ td.seleccionada {
   display: none;
   gap: 10px;
   z-index: 9999;
-
   background: rgba(255,255,255,0.95);
   padding: 10px 14px;
   border-radius: 16px;
   box-shadow: 0 6px 18px rgba(0,0,0,0.25);
-
   pointer-events: auto;
+  transition: opacity 0.2s ease; /* 🔥 opcional: suaviza la aparición */
 }
+
 
 
 
