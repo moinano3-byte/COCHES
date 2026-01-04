@@ -1134,13 +1134,14 @@ function ocultarAccionesMovil() {
   accionesMovil.style.display = "none";
 }
 
-/* Seleccionar rectángulo de celdas */
 function seleccionarRectangulo(tdFin, mantener = false) {
   if (!celdaInicio || !tdFin) return;
   if (!mantener) limpiarSeleccion();
 
-  const filaIni = celdaInicio.parentElement.rowIndex;
-  const filaFin = tdFin.parentElement.rowIndex;
+  const filas = Array.from(tbody.rows); // SOLO filas del tbody
+
+  const filaIni = filas.indexOf(celdaInicio.parentElement);
+  const filaFin = filas.indexOf(tdFin.parentElement);
   const colIni = celdaInicio.cellIndex;
   const colFin = tdFin.cellIndex;
 
@@ -1150,9 +1151,7 @@ function seleccionarRectangulo(tdFin, mantener = false) {
   const cMax = Math.max(colIni, colFin);
 
   for (let f = fMin; f <= fMax; f++) {
-    const fila = tbody.rows[f];
-    if (!fila) continue;
-
+    const fila = filas[f];
     for (let c = cMin; c <= cMax; c++) {
       const td = fila.cells[c];
       if (esSeleccionable(td)) {
@@ -1222,12 +1221,13 @@ tbody.addEventListener("mouseup", e => {
   arrastrando = false;
 });
 
-
-
 /* =========================================================
    SELECCIÓN TÁCTIL (MÓVIL)
 ========================================================= */
 tbody.addEventListener("touchstart", e => {
+  // 🔑 ignorar multi-touch (pinch/zoom)
+  if (e.touches.length > 1) return;
+
   const td = e.target.closest("td");
   if (!esSeleccionable(td)) return;
 
@@ -1246,7 +1246,8 @@ tbody.addEventListener("touchstart", e => {
 }, { passive: true });
 
 tbody.addEventListener("touchmove", e => {
-  if (!celdaInicio) return;
+  // 🔑 ignorar multi-touch
+  if (e.touches.length > 1 || !celdaInicio) return;
 
   const touch = e.touches[0];
   const elem = document.elementFromPoint(touch.clientX, touch.clientY);
@@ -1257,12 +1258,20 @@ tbody.addEventListener("touchmove", e => {
 
   seleccionarRectangulo(td, true);
 
-  // Bloquear scroll mientras arrastramos
+  // 🔑 bloquear scroll solo mientras arrastramos
   e.preventDefault();
 }, { passive: false });
 
 tbody.addEventListener("touchend", e => {
   clearTimeout(touchTimer);
+
+  // 🔑 ignorar multi-touch
+  if (e.changedTouches.length > 1) {
+    celdaInicio = null;
+    arrastrando = false;
+    modoSeleccionMovil = false;
+    return;
+  }
 
   const touch = e.changedTouches[0];
 
@@ -1282,6 +1291,7 @@ tbody.addEventListener("touchend", e => {
 });
 
 
+
 /* =========================================================
    TECLAS PARA CAMBIAR ESTADO
 ========================================================= */
@@ -1290,11 +1300,18 @@ document.addEventListener("keydown", e => {
 
   let nuevoEstado = null;
 
-  if (e.key === "p" || e.key === "P") nuevoEstado = "2"; // 👤
-  else if (e.key === "c" || e.key === "C") nuevoEstado = "3"; // 🚗
-  else if (e.key === "-") nuevoEstado = "1"; // -
-  else if (e.key === "Delete" || e.key === "Backspace") nuevoEstado = "0";
-  else if (e.key === "Delete" || e.key === "Backspace" || e.key === " ") nuevoEstado = "0"; // vaciar también con espacio
+  if (e.key === "p" || e.key === "P") {
+    nuevoEstado = "2"; // 👤
+  } else if (e.key === "c" || e.key === "C") {
+    nuevoEstado = "3"; // 🚗
+  } else if (e.key === "-") {
+    nuevoEstado = "1"; // -
+  } else if (e.key === "Delete" || e.key === "Backspace") {
+    nuevoEstado = "0"; // vaciar
+  } else if (e.key === " " || e.key === "Spacebar") { // espacio
+    nuevoEstado = "0"; // vaciar
+    e.preventDefault(); // 🔑 evitar que la página haga scroll
+  }
 
   if (nuevoEstado === null) return;
 
@@ -1305,6 +1322,7 @@ document.addEventListener("keydown", e => {
 
   recalcular();
 });
+
 
 
 /* =========================================================
