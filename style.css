@@ -319,16 +319,26 @@ td.seleccionada {
   pointer-events: auto;
   transition: opacity 0.2s ease; /* 🔥 opcional: suaviza la aparición */
 }
-/* ===== BLOQUEO DE GESTOS NATIVOS EN LA TABLA ===== */
-#cuadrante {
-  touch-action: none;        /* 🔑 evita pinch-zoom y scroll táctil */
-  overscroll-behavior: none;
+/* =========================================================
+   ===== CONTROL DE SCROLL Y GESTOS EN MÓVIL (FINAL)
+   ========================================================= */
+
+/* 🔒 Evita selección de texto y gestos raros en celdas */
+#cuadrante td,
+#cuadrante th {
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
 }
 
-/* ===== BLOQUEO DE SCROLL DURANTE SELECCIÓN MÓVIL ===== */
+/* 🧠 La tabla NO hace scroll ni gestos propios */
+#cuadrante {
+  touch-action: none;
+  overscroll-behavior: contain;
+}
+
+/* 🚫 Bloqueo TOTAL de scroll SOLO mientras se arrastra */
 body.no-scroll {
   overflow: hidden;
-  touch-action: none;
+  overscroll-behavior: none;
 }
-
-
