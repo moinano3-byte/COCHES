@@ -319,9 +319,11 @@ td.seleccionada {
   pointer-events: auto;
   transition: opacity 0.2s ease; /* 🔥 opcional: suaviza la aparición */
 }
-
-
-
+/* ===== BLOQUEO DE GESTOS NATIVOS EN LA TABLA ===== */
+#cuadrante {
+  touch-action: none;        /* 🔑 evita pinch-zoom y scroll táctil */
+  overscroll-behavior: none;
+}
 
 /* ===== BLOQUEO DE SCROLL DURANTE SELECCIÓN MÓVIL ===== */
 body.no-scroll {
