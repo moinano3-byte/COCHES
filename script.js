@@ -1210,7 +1210,7 @@ tbody.addEventListener("touchstart", e => {
 
 tbody.addEventListener("touchmove", e => {
   if (!modoSeleccionMovil || !celdaInicio) return;
-
+e.preventDefault(); // ⛔ BLOQUEA EL SCROLL
   const touch = e.touches[0];
   const elem = document.elementFromPoint(touch.clientX, touch.clientY);
   const td = elem?.closest("td");
@@ -1284,3 +1284,4 @@ document.addEventListener("keydown", e => {
   limpiarSeleccion(); // quitar azul automáticamente
 });
 };
+
