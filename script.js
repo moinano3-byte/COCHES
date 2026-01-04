@@ -1227,8 +1227,7 @@ tbody.addEventListener("mouseup", e => {
 tbody.addEventListener("touchstart", e => {
   // 🔑 Pinch / zoom → cancelar totalmente
   if (e.touches.length > 1) {
-    e.preventDefault();
-    celdaInicio = null;
+        celdaInicio = null;
     modoSeleccionMovil = false;
     return;
   }
