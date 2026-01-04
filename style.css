@@ -322,6 +322,10 @@ td.seleccionada {
   padding: 10px 14px;
   border-radius: 12px;
 }
+body.no-scroll {
+  overflow: hidden;
+  touch-action: none;
+}
 
 
 
