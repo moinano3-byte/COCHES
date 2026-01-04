@@ -1201,6 +1201,10 @@ tbody.addEventListener("touchstart", e => {
 
   touchTimer = setTimeout(() => {
     modoSeleccionMovil = true;
+
+    // ⛔ bloquear scroll
+    document.body.classList.add("no-scroll");
+
     limpiarSeleccion();
     td.classList.add("seleccionada");
     seleccion.add(td);
@@ -1210,7 +1214,10 @@ tbody.addEventListener("touchstart", e => {
 
 tbody.addEventListener("touchmove", e => {
   if (!modoSeleccionMovil || !celdaInicio) return;
-e.preventDefault(); // ⛔ BLOQUEA EL SCROLL
+
+  // ⛔ IMPRESCINDIBLE: evita scroll mientras arrastras
+  e.preventDefault();
+
   const touch = e.touches[0];
   const elem = document.elementFromPoint(touch.clientX, touch.clientY);
   const td = elem?.closest("td");
@@ -1219,11 +1226,14 @@ e.preventDefault(); // ⛔ BLOQUEA EL SCROLL
 
   arrastrando = true;
   seleccionarRectangulo(td, true);
-});
+}, { passive: false }); // 🔥 CLAVE ABSOLUTA
 
 
 tbody.addEventListener("touchend", () => {
   clearTimeout(touchTimer);
+
+  // ✅ devolver scroll
+  document.body.classList.remove("no-scroll");
 
   if (celdaInicio && !modoSeleccionMovil && !arrastrando) {
     celdaInicio.dataset.estado =
@@ -1232,28 +1242,11 @@ tbody.addEventListener("touchend", () => {
     recalcular();
   }
 
+  modoSeleccionMovil = false;
   celdaInicio = null;
   arrastrando = false;
 });
-const accionesMovil = document.getElementById("acciones-movil");
 
-if (esMovil) {
-  accionesMovil.style.display = "flex";
-}
-accionesMovil.addEventListener("click", e => {
-  const btn = e.target.closest("button");
-  if (!btn) return;
-
-  const estado = btn.dataset.estado;
-
-  seleccion.forEach(td => {
-    td.dataset.estado = estado;
-    renderEstado(td);
-  });
-
-  recalcular();
-  limpiarSeleccion();
-});
 
 
 
@@ -1284,4 +1277,3 @@ document.addEventListener("keydown", e => {
   limpiarSeleccion(); // quitar azul automáticamente
 });
 };
-
