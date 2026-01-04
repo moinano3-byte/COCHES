@@ -323,10 +323,6 @@ td.seleccionada {
   border-radius: 12px;
 }
 
-/* ===== BLOQUEO DE SCROLL DURANTE SELECCIÓN MÓVIL ===== */
-body.no-scroll {
-  overflow: hidden;
-  touch-action: none;
-}
+
 
 
