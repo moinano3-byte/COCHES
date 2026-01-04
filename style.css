@@ -312,16 +312,31 @@ td.seleccionada {
   bottom: 15px;
   left: 50%;
   transform: translateX(-50%);
-  display: none;
-  gap: 10px;
+  display: flex;        /* 🔹 antes estaba "none" por defecto, mostrarlo con JS */
+  gap: 12px;
   z-index: 9999;
 }
 
 #acciones-movil button {
-  font-size: 22px;
-  padding: 10px 14px;
-  border-radius: 12px;
+  font-size: 48px;          /* icono grande */
+  width: 96px;               /* botón cuadrado */
+  height: 96px;              /* botón cuadrado */
+  border-radius: 20px;       /* esquinas suaves */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;                /* quitar padding que deformaba */
+  cursor: pointer;
+  border: 2px solid #aaa;    /* marco visible */
+  background: #f0f0f0;       /* fondo gris suave */
+  transition: transform 0.1s ease;
 }
+
+#acciones-movil button:active {
+  transform: scale(0.92);    /* efecto al presionar */
+  background: #dfe9f3;
+}
+
 
 
 
