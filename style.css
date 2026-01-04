@@ -1,348 +1,40 @@
-/* ===== ESTILOS GENERALES ===== */
-body {
-  font-family: "Comic Sans MS", "Comic Sans", cursive;
-  color: black;
-  font-weight: 900;
-  padding: 20px;
-  margin: 0;
-}
-
-/* ===== MODO MENÚ (pantalla inicial) ===== */
-body.modo-menu {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 100vh;
-  padding: 0;
-  background: linear-gradient(135deg, #dfe9f3, #ffffff);
-}
-
-/* ===== MENÚ CONFIGURACIÓN ===== */
-#menu-config {
-  display: flex;
-  flex-direction: column;
-  align-items: center; /* Centrado horizontal de todo el bloque */
-  gap: 20px;
-  padding: 35px 45px;
-  background: #ffffff;
-  border-radius: 18px;
-  border: none;
-  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
-  font-size: 18px;
-  min-width: 420px;
-  max-width: 520px;
-  text-align: center;
-  animation: aparecer 0.4s ease-out;
-  margin: auto; /* centrado absoluto */
-}
-
-#menu-config::before {
-  content: "CONFIGURAR CUADRANTE";
-  display: block;
-  text-align: center;
-  font-size: 32px;
-  font-weight: 900;
-  margin-bottom: 25px;
-  color: #9BBB59;
-}
-
-/* ===== BLOQUES DE MENÚ DESPLEGABLE ===== */
-.bloque-menu {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  width: 100%;
-}
-
-/* ===== BOTONES DE MENÚ ===== */
-.btn-menu {
-  padding: 14px 20px;
-  font-size: 20px;
-  font-weight: 900;
-  border-radius: 14px;
-  border: 2px solid #aaa;
-  background: linear-gradient(135deg, #eaeaea, #ffffff);
-  cursor: pointer;
-  transition: all 0.2s ease;
-  text-align: left;
-  width: 100%;
-}
-
-.btn-menu:hover {
-  background: #f0f0f0; /* resaltar */
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); /* sombra sutil */
-  transform: none; /* eliminar el movimiento que borra */
-}
-
-/* ===== SUBMENÚS ===== */
-.submenu {
-  display: none;
-  padding: 18px;
-  border-radius: 14px;
-  background: #f7f9fc;
-  box-shadow: inset 0 0 0 2px #d0d0d0;
-}
-
-.submenu label {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 15px;
-  font-size: 19px;
-}
-
-.submenu select,
-.submenu input[type="number"] {
-  font-size: 18px;
-  padding: 6px 10px;
-  border-radius: 8px;
-  border: 2px solid #aaa;
-}
-
-.submenu input[type="checkbox"] {
-  transform: scale(1.3);
-  cursor: pointer;
-}
-
-/* ===== BOTÓN GENERAR ===== */
-#btn-generar {
-  padding: 18px;
-  font-size: 22px;
-  font-weight: 900;
-  border-radius: 14px;
-  border: none;
-  cursor: pointer;
-  background: linear-gradient(135deg, #70AD47, #9BBB59);
-  color: white;
-  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.25);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-  letter-spacing: 1px;
-  width: 100%;
-  max-width: 360px; /* Ancho máximo para mantener estética */
-  align-self: center; /* Centrado dentro del contenedor */
-}
-
-#btn-generar:hover {
-  transform: scale(1.05);
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
-}
-
-/* ===== TABLA ===== */
-table {
-  border-collapse: collapse;
-  width: auto;
-  table-layout: auto;
-}
-
-th, td {
-  border: 1px solid #000000;
-  padding: 4px 6px;
-  white-space: nowrap;
-  text-align: center;
-  vertical-align: middle;
-  font-weight: bold;
-  color: black !important;
-}
-
-td {
-  width: 40px;
-}
-
-
-/* ===== ENCABEZADOS ===== */
-thead th {
-  background-color: #ccc;
-}
-
-.nombres {
-  background-color: #ddd;
-}
-
-.fecha {
-  background-color: #ffffff;
-  cursor: default;
-}
-
-/* ===== BOTONES + / - COLUMNAS ===== */
-.boton-columna {
-  padding: 4px 8px;
-  font-size: 12px;
-  margin: 0 2px;
-  cursor: pointer;
-  border-radius: 6px;
-}
-
-/* ===== COLORES POR ZONA ===== */
-td.zona1, th.zona1 { background-color: #70AD47; color: white; }
-td.zona2, th.zona2 { background-color: #9BBB59; color: white; }
-td.zona3, th.zona3 { background-color: #FFC000; color: white; }
-td.zona4, th.zona4 { background-color: #FABF8F; color: white; }
-td.zona5, th.zona5 { background-color: #B2A1C7; color: white; }
-
-/* ===== SEPARADORES ===== */
-.separador-semanal td {
-  height: 15px;
-  background-color: #bbb;
-  border: 1px solid #000000;
-  padding: 0;
-}
-
-.separador-fino td {
-  background-color: #ccc;
-  height: 15px;
-  padding: 0;
-  border: none;
-}
-
-/* ===== NO INTERACTIVOS ===== */
-td.celda-no-interactiva {
-  background-color: #a0a0a0;
-  color: #000;
-  user-select: none;
-}
-
-/* ===== SELECCIÓN ===== */
-td.seleccionada {
-  outline: 2px solid #1976d2;
-  background-color: rgba(25, 118, 210, 0.15);
-}
-
-/* ===== BOTÓN MES ===== */
-.boton-mes {
-  width: 100%;
-  height: 100%;
-  padding: 0;
-  margin: 0;
-  border: none;
-  background: transparent;
-  font-size: 16px;
-  cursor: pointer;
-}
-
-.boton-mes:hover {
-  background-color: rgba(0, 0, 0, 0.1);
-}
-
-/* ===== ANIMACIONES ===== */
-@keyframes aparecer {
-  from {
-    opacity: 0;
-    transform: scale(0.9);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1.15);
-  }
-}
-
-/* ===== PANTALLA DE ZONAS ===== */
-#pantalla-zonas {
-  display: none; /* se mostrará desde JS */
-  flex-direction: column;
-  align-items: center;
-  gap: 15px;
-  padding: 35px 45px;
-  background: #ffffff;
-  border-radius: 18px;
-  box-shadow: 0 15px 40px rgba(0,0,0,0.15);
-  min-width: 420px;
-  max-width: 520px;
-  margin: auto; /* centrado horizontal */
-  text-align: center;
-}
-
-.pantalla-zonas input[type="text"],
-#pantalla-zonas input[type="text"] {
-  width: 100%;
-  padding: 6px 10px;
-  border-radius: 8px;
-  border: 2px solid #aaa;
-  font-size: 16px;
-}
-
-.pantalla-zonas label,
-#pantalla-zonas label {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 10px;
-  font-size: 18px;
-}
-/* 👤 PERSONA (SVG) */
-.icono-persona {
-  position: absolute;
-  inset: 0;
-  margin: auto;
-
-  height: 3em;     /* 🔥 AQUÍ controlas el tamaño */
-  width: auto;
-
-  pointer-events: none;
-}
-
-
-
-
-/* 🖼️ VOLANTE */
-.icono-volante {
-  position: absolute;
-
-  inset: 0;             /* 🔥 ocupa exactamente la celda */
-  margin: auto;
-
-  height: 2.5em;        /* puede sobresalir */
-  width: auto;
-
-  pointer-events: none;
-}
-
-.viajero {
-  height: 30px;
-  min-height: 30px;
-  max-height: 30px;
-
-  position: relative;
-  text-align: center;
-  vertical-align: middle;
-
-  overflow: visible;   /* 🔥 CLAVE FINAL */
-}
+/* ===== BOTONES MÓVIL – GRANDES Y EN VERTICAL ===== */
 #acciones-movil {
   position: fixed;
   display: none;
-  gap: 10px;
+  flex-direction: column;      /* 🔑 vertical */
+  gap: 16px;
+
   z-index: 9999;
-  background: rgba(255,255,255,0.95);
-  padding: 10px 14px;
-  border-radius: 16px;
-  box-shadow: 0 6px 18px rgba(0,0,0,0.25);
+  background: rgba(255, 255, 255, 0.95);
+  padding: 18px 20px;
+  border-radius: 20px;
+  box-shadow: 0 8px 22px rgba(0,0,0,0.3);
+
   pointer-events: auto;
-  transition: opacity 0.2s ease; /* 🔥 opcional: suaviza la aparición */
-}
-/* =========================================================
-   ===== CONTROL DE SCROLL Y GESTOS EN MÓVIL (FINAL)
-   ========================================================= */
-
-/* 🔒 Evita selección de texto y gestos raros en celdas */
-#cuadrante td,
-#cuadrante th {
-  user-select: none;
-  -webkit-user-select: none;
-  -webkit-touch-callout: none;
 }
 
-/* 🧠 La tabla NO hace scroll ni gestos propios */
-#cuadrante {
-  touch-action: none;
-  overscroll-behavior: contain;
+/* Botones grandes */
+#acciones-movil button {
+  width: 72px;                 /* 🔥 doble aprox */
+  height: 72px;
+
+  font-size: 36px;             /* icono grande */
+  font-weight: 900;
+
+  border: none;
+  border-radius: 18px;
+
+  background: #f0f0f0;
+  cursor: pointer;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-/* 🚫 Bloqueo TOTAL de scroll SOLO mientras se arrastra */
-body.no-scroll {
-  overflow: hidden;
-  overscroll-behavior: none;
-}
-/* ===== EVITAR PULL-TO-REFRESH EN EL CUADRANTE ===== */
-#contenedor-cuadrante {
-  overscroll-behavior-y: contain; /* 🔑 bloquea refresh */
+/* Feedback táctil */
+#acciones-movil button:active {
+  transform: scale(0.92);
+  background: #dfe9f3;
 }
