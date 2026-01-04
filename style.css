@@ -309,21 +309,31 @@ td.seleccionada {
 }
 #acciones-movil {
   position: fixed;
-  display: none;
-  gap: 10px;
+  display: none;             /* se muestra solo cuando toca JS */
+  flex-direction: row;       /* ⚡ alinear botones horizontalmente */
+  flex-wrap: wrap;           /* ⚡ que bajen de línea si no caben */
+  justify-content: center;   /* ⚡ centrar los botones */
+  gap: 12px;                 /* espacio entre botones */
+  
+  bottom: 20px;              /* ⚡ fijo en la parte inferior */
+  left: 50%;
+  transform: translateX(-50%); /* ⚡ centrar horizontalmente */
+  
   z-index: 9999;
   background: rgba(255,255,255,0.95);
-  padding: 10px 14px;
-  border-radius: 16px;
-  box-shadow: 0 6px 18px rgba(0,0,0,0.25);
-  pointer-events: auto;
-  transition: opacity 0.2s ease; /* 🔥 opcional: suaviza la aparición */
+  padding: 12px 16px;
+  border-radius: 20px;
+  box-shadow: 0 8px 22px rgba(0,0,0,0.3);
 }
 
 /* ===== BLOQUEO DE SCROLL DURANTE SELECCIÓN MÓVIL ===== */
 body.no-scroll {
   overflow: hidden;
   touch-action: none;
+}
+#acciones-movil button:active {
+  transform: scale(0.92);
+  background: #dfe9f3;
 }
 
 
