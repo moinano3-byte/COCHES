@@ -1165,59 +1165,63 @@ function seleccionarRectangulo(tdFin, mantener = false) {
 
 
 /* =========================================================
-   SELECCIÓN CON RATÓN MEJORADA (mantener selección al soltar)
+   SELECCIÓN CON RATÓN (PC) — COMPORTAMIENTO CORRECTO
 ========================================================= */
+
 tbody.addEventListener("mousedown", e => {
   const td = e.target.closest("td");
   if (!esSeleccionable(td)) return;
 
-  // Si no se pulsa Ctrl, limpiar selección anterior
+  e.stopPropagation();
+  e.preventDefault();
+
   if (!e.ctrlKey) limpiarSeleccion();
 
   celdaInicio = td;
   arrastrando = false;
-
-  // Marcamos la celda inicial
-  td.classList.add("seleccionada");
-  seleccion.add(td);
-
-  e.preventDefault(); // evita seleccionar texto accidentalmente
 });
 
 tbody.addEventListener("mousemove", e => {
   if (!celdaInicio) return;
 
-  const td = e.target.closest("td");
-  if (!esSeleccionable(td)) return;
+  // Obtener la celda real bajo el cursor
+  const elementos = document.elementsFromPoint(e.clientX, e.clientY);
+  const td = elementos.find(el => esSeleccionable(el));
+  if (!td) return;
 
   arrastrando = true;
 
-  // Limpiar selección solo si no se pulsa Ctrl (mantener selección previa)
-  if (!e.ctrlKey) limpiarSeleccion();
-  seleccionarRectangulo(td, true);
+  seleccionarRectangulo(td, false);
 });
 
+
 tbody.addEventListener("mouseup", e => {
+  e.stopPropagation(); // 🔑 CLAVE
+
   if (!celdaInicio) return;
 
-  const td = e.target.closest("td");
-  if (!td || !esSeleccionable(td)) {
+  // Siempre usar celdaInicio
+  const td = celdaInicio;
+  if (!esSeleccionable(td)) {
     celdaInicio = null;
     arrastrando = false;
     return;
   }
 
+  // Click simple (sin arrastrar)
   if (!arrastrando && !e.ctrlKey) {
-    // Click simple: cambia estado de la celda
-    td.dataset.estado = (Number(td.dataset.estado) + 1) % estados.length;
+    // Rotar estado: 0 → 1 → 2 → 3 → 0
+    let nuevoEstado = (Number(td.dataset.estado) + 1) % estados.length;
+    td.dataset.estado = nuevoEstado;
     renderEstado(td);
     recalcular();
   }
 
-  // No limpiamos la selección para poder usar teclas
+  // Reset
   celdaInicio = null;
   arrastrando = false;
 });
+
 
 
 /* =========================================================
@@ -1284,23 +1288,24 @@ tbody.addEventListener("touchend", e => {
 document.addEventListener("keydown", e => {
   if (seleccion.size === 0) return;
 
-  let estado = null;
+  let nuevoEstado = null;
 
-  if (e.key === "-") estado = 1;
-  else if (e.key.toLowerCase() === "m") estado = 2;
-  else if (e.key.toLowerCase() === "c") estado = 3;
-  else if (e.code === "Space") { estado = 0; e.preventDefault(); }
-  else return;
+  if (e.key === "p" || e.key === "P") nuevoEstado = "2"; // 👤
+  else if (e.key === "c" || e.key === "C") nuevoEstado = "3"; // 🚗
+  else if (e.key === "-") nuevoEstado = "1"; // -
+  else if (e.key === "Delete" || e.key === "Backspace") nuevoEstado = "0";
+  else if (e.key === "Delete" || e.key === "Backspace" || e.key === " ") nuevoEstado = "0"; // vaciar también con espacio
+
+  if (nuevoEstado === null) return;
 
   seleccion.forEach(td => {
-    if (!esSeleccionable(td)) return;
-    td.dataset.estado = estado;
+    td.dataset.estado = nuevoEstado;
     renderEstado(td);
   });
 
   recalcular();
-  limpiarSeleccion();
 });
+
 
 /* =========================================================
    BOTONES DE ACCIONES MÓVILES
@@ -1319,11 +1324,16 @@ accionesMovil.querySelectorAll("button").forEach(btn => {
   });
 });
 
-  // Ocultar acciones al tocar fuera
-  document.addEventListener("click", e => {
-    if (!accionesMovil.contains(e.target)) {
-      limpiarSeleccion();
-      ocultarAccionesMovil();
-    }
-  });
+// Ocultar acciones y limpiar selección al hacer click FUERA
+document.addEventListener("click", e => {
+  // Click dentro de la tabla → NO limpiar selección
+  if (tbody.contains(e.target)) return;
+
+  // Click dentro del menú móvil → NO cerrar
+  if (accionesMovil.contains(e.target)) return;
+
+  limpiarSeleccion();
+  ocultarAccionesMovil();
+});
+
 } // <-- cierre de generarCuadrante
