@@ -1222,11 +1222,15 @@ tbody.addEventListener("mouseup", e => {
 });
 
 /* =========================================================
-   SELECCIÓN TÁCTIL (MÓVIL)
+   SELECCIÓN TÁCTIL (MÓVIL) MEJORADA
 ========================================================= */
 tbody.addEventListener("touchstart", e => {
-  // 🔑 ignorar multi-touch (pinch/zoom)
-  if (e.touches.length > 1) return;
+  if (e.touches.length > 1) {
+    // Si hay más de un dedo, es zoom/pinch, no seleccionamos
+    celdaInicio = null;
+    modoSeleccionMovil = false;
+    return;
+  }
 
   const td = e.target.closest("td");
   if (!esSeleccionable(td)) return;
@@ -1246,8 +1250,14 @@ tbody.addEventListener("touchstart", e => {
 }, { passive: true });
 
 tbody.addEventListener("touchmove", e => {
-  // 🔑 ignorar multi-touch
-  if (e.touches.length > 1 || !celdaInicio) return;
+  if (!celdaInicio) return;
+
+  if (e.touches.length > 1) {
+    // Si se usan dos dedos, ignoramos arrastre
+    celdaInicio = null;
+    modoSeleccionMovil = false;
+    return;
+  }
 
   const touch = e.touches[0];
   const elem = document.elementFromPoint(touch.clientX, touch.clientY);
@@ -1256,30 +1266,25 @@ tbody.addEventListener("touchmove", e => {
 
   arrastrando = true;
 
+  // Seleccionar rectángulo desde celdaInicio
   seleccionarRectangulo(td, true);
 
-  // 🔑 bloquear scroll solo mientras arrastramos
+  // Evitar scroll mientras arrastramos
   e.preventDefault();
 }, { passive: false });
 
 tbody.addEventListener("touchend", e => {
   clearTimeout(touchTimer);
 
-  // 🔑 ignorar multi-touch
-  if (e.changedTouches.length > 1) {
-    celdaInicio = null;
-    arrastrando = false;
-    modoSeleccionMovil = false;
-    return;
-  }
+  if (!celdaInicio) return;
 
   const touch = e.changedTouches[0];
 
-  if (modoSeleccionMovil || arrastrando) {
-    // Mostramos menú SOLO al final del arrastre
-    if (seleccion.size > 0) mostrarAccionesMovil(touch.clientX, touch.clientY);
-  } else if (celdaInicio) {
-    // Si solo fue tap corto sin arrastrar
+  if ((modoSeleccionMovil || arrastrando) && seleccion.size > 0) {
+    // Mostrar menú al final del arrastre
+    mostrarAccionesMovil(touch.clientX, touch.clientY);
+  } else if (!arrastrando) {
+    // Tap corto: cambiar estado de la celda
     celdaInicio.dataset.estado = (Number(celdaInicio.dataset.estado) + 1) % estados.length;
     renderEstado(celdaInicio);
     recalcular();
