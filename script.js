@@ -1222,11 +1222,11 @@ tbody.addEventListener("mouseup", e => {
 });
 
 /* =========================================================
-   SELECCIÓN TÁCTIL (MÓVIL) MEJORADA
+   SELECCIÓN TÁCTIL (MÓVIL) DEFINITIVA
 ========================================================= */
 tbody.addEventListener("touchstart", e => {
+  // 🔑 Pinch / zoom → cancelar totalmente
   if (e.touches.length > 1) {
-    // 🔑 Pinch / zoom → cancelar totalmente
     e.preventDefault();
     celdaInicio = null;
     modoSeleccionMovil = false;
@@ -1236,7 +1236,8 @@ tbody.addEventListener("touchstart", e => {
   const td = e.target.closest("td");
   if (!esSeleccionable(td)) return;
 
-  e.preventDefault(); // 🔑 evita que el navegador inicie scroll
+  e.preventDefault();                 // 🔑 evita scroll / refresh
+  document.body.classList.add("no-scroll");
 
   celdaInicio = td;
   arrastrando = false;
@@ -1248,20 +1249,22 @@ tbody.addEventListener("touchstart", e => {
     td.classList.add("seleccionada");
     seleccion.add(td);
   }, 300);
-}, { passive: false }); // 🔑 MUY IMPORTANTE
+}, { passive: false });
 
 
 tbody.addEventListener("touchmove", e => {
   if (!celdaInicio) return;
 
+  // 🔑 Si aparece pinch, cancelar selección
   if (e.touches.length > 1) {
-    e.preventDefault(); // 🔑 bloquear zoom
+    e.preventDefault();
     celdaInicio = null;
     modoSeleccionMovil = false;
+    document.body.classList.remove("no-scroll");
     return;
   }
 
-  e.preventDefault(); // 🔑 bloquea scroll SIEMPRE que hay drag
+  e.preventDefault(); // 🔑 bloquea scroll SIEMPRE durante drag
 
   const touch = e.touches[0];
   const elem = document.elementFromPoint(touch.clientX, touch.clientY);
@@ -1275,17 +1278,18 @@ tbody.addEventListener("touchmove", e => {
 
 tbody.addEventListener("touchend", e => {
   clearTimeout(touchTimer);
+  document.body.classList.remove("no-scroll");
 
   if (!celdaInicio) return;
 
   const touch = e.changedTouches[0];
 
   if ((modoSeleccionMovil || arrastrando) && seleccion.size > 0) {
-    // Mostrar menú al final del arrastre
     mostrarAccionesMovil(touch.clientX, touch.clientY);
   } else if (!arrastrando) {
-    // Tap corto: cambiar estado de la celda
-    celdaInicio.dataset.estado = (Number(celdaInicio.dataset.estado) + 1) % estados.length;
+    // Tap corto
+    celdaInicio.dataset.estado =
+      (Number(celdaInicio.dataset.estado) + 1) % estados.length;
     renderEstado(celdaInicio);
     recalcular();
   }
@@ -1294,7 +1298,6 @@ tbody.addEventListener("touchend", e => {
   arrastrando = false;
   modoSeleccionMovil = false;
 });
-
 
 
 /* =========================================================
