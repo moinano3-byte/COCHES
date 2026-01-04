@@ -1104,8 +1104,11 @@ recalcular();
 let celdaInicio = null;
 let seleccion = new Set();
 let arrastrando = false;
-let touchTimer = null;
 let modoSeleccionMovil = false;
+
+const accionesMovil = document.getElementById("acciones-movil");
+let touchTimer = null;
+let ultimoTouch = null;
 
 /* Solo celdas que pueden cambiar de estado */
 function esSeleccionable(td) {
@@ -1245,11 +1248,15 @@ tbody.addEventListener("touchmove", e => {
 
 
 
-tbody.addEventListener("touchend", () => {
+tbody.addEventListener("touchend", e => {
   clearTimeout(touchTimer);
 
-  // 👉 ocultar botones al soltar
-  ocultarAccionesMovil();
+  const touch = e.changedTouches[0]; // posición donde se soltó el dedo
+
+  // 👉 Solo mostrar botones si hubo selección múltiple (modoSeleccionMovil)
+  if (modoSeleccionMovil && seleccion.size > 0) {
+    mostrarAccionesMovil(touch.clientX, touch.clientY);
+  }
 
   // Tap corto → cambiar estado normal
   if (celdaInicio && !modoSeleccionMovil && !arrastrando) {
@@ -1259,6 +1266,7 @@ tbody.addEventListener("touchend", () => {
     recalcular();
   }
 
+  // Reiniciar flags
   celdaInicio = null;
   arrastrando = false;
   modoSeleccionMovil = false;
