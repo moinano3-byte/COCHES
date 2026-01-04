@@ -342,3 +342,7 @@ body.no-scroll {
   overflow: hidden;
   overscroll-behavior: none;
 }
+/* ===== EVITAR PULL-TO-REFRESH EN EL CUADRANTE ===== */
+#contenedor-cuadrante {
+  overscroll-behavior-y: contain; /* 🔑 bloquea refresh */
+}
