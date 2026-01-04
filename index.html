@@ -65,7 +65,11 @@
   </div>
 
   <!-- ===== PANTALLA FESTIVOS ===== -->
-  <div id="pantalla-findes-festivos" style="display:none; flex-direction: column; align-items: center; gap: 20px; padding: 35px 45px; background: #ffffff; border-radius: 18px; box-shadow: 0 15px 40px rgba(0,0,0,0.15); min-width: 420px; max-width: 520px; margin: auto; text-align: center;">
+  <div id="pantalla-findes-festivos"
+       style="display:none; flex-direction: column; align-items: center; gap: 20px;
+              padding: 35px 45px; background: #ffffff; border-radius: 18px;
+              box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+              min-width: 420px; max-width: 520px; margin: auto; text-align: center;">
     <h2>Festivos</h2>
 
     <label>
@@ -84,17 +88,21 @@
       </select>
     </label>
 
-    <div id="festivos-fechas" style="display:none; flex-direction: column; gap:5px; margin-top:10px; width:100%;">
+    <div id="festivos-fechas"
+         style="display:none; flex-direction: column; gap:5px; margin-top:10px; width:100%;">
       <p>Seleccione los Festivos anuales:</p>
       <div id="lista-fechas"></div>
-      <button type="button" id="agregar-fecha" class="btn-menu" style="width:50%; align-self:center;">
+      <button type="button" id="agregar-fecha" class="btn-menu"
+              style="width:50%; align-self:center;">
         Añadir Fecha
       </button>
     </div>
 
     <div style="display:flex; gap:10px; margin-top:20px;">
-      <button id="guardar-findes-festivos" class="btn-menu" style="background:#70AD47; color:white;">Guardar</button>
-      <button id="volver-findes-festivos" class="btn-menu" style="background:#aaa; color:white;">Volver</button>
+      <button id="guardar-findes-festivos" class="btn-menu"
+              style="background:#70AD47; color:white;">Guardar</button>
+      <button id="volver-findes-festivos" class="btn-menu"
+              style="background:#aaa; color:white;">Volver</button>
     </div>
   </div>
 
@@ -121,15 +129,14 @@
     </div>
   </div>
 
-<!-- ===== TABLA DEL CUADRANTE ===== -->
-<div id="contenedor-cuadrante">
-  <table id="cuadrante">
-    <tbody></tbody>
-  </table>
-</div>
+  <!-- ===== CUADRANTE ===== -->
+  <div id="contenedor-cuadrante">
+    <table id="cuadrante">
+      <tbody></tbody>
+    </table>
+  </div>
 
-
-  <!-- ===== BOTONES MÓVIL (AÑADIDO) ===== -->
+  <!-- ===== BOTONES MÓVIL ===== -->
   <div id="acciones-movil">
     <button data-estado="2">👤</button>
     <button data-estado="3">🚗</button>
