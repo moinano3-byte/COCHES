@@ -1226,7 +1226,8 @@ tbody.addEventListener("mouseup", e => {
 ========================================================= */
 tbody.addEventListener("touchstart", e => {
   if (e.touches.length > 1) {
-    // Si hay más de un dedo, es zoom/pinch, no seleccionamos
+    // 🔑 Pinch / zoom → cancelar totalmente
+    e.preventDefault();
     celdaInicio = null;
     modoSeleccionMovil = false;
     return;
@@ -1235,29 +1236,32 @@ tbody.addEventListener("touchstart", e => {
   const td = e.target.closest("td");
   if (!esSeleccionable(td)) return;
 
+  e.preventDefault(); // 🔑 evita que el navegador inicie scroll
+
   celdaInicio = td;
   arrastrando = false;
   modoSeleccionMovil = false;
 
-  // Solo iniciar timer para menú si hacemos "tap largo"
   touchTimer = setTimeout(() => {
     modoSeleccionMovil = true;
     limpiarSeleccion();
     td.classList.add("seleccionada");
     seleccion.add(td);
-    // NO mostrar menú aún, lo haremos en touchend
   }, 300);
-}, { passive: true });
+}, { passive: false }); // 🔑 MUY IMPORTANTE
+
 
 tbody.addEventListener("touchmove", e => {
   if (!celdaInicio) return;
 
   if (e.touches.length > 1) {
-    // Si se usan dos dedos, ignoramos arrastre
+    e.preventDefault(); // 🔑 bloquear zoom
     celdaInicio = null;
     modoSeleccionMovil = false;
     return;
   }
+
+  e.preventDefault(); // 🔑 bloquea scroll SIEMPRE que hay drag
 
   const touch = e.touches[0];
   const elem = document.elementFromPoint(touch.clientX, touch.clientY);
@@ -1265,13 +1269,9 @@ tbody.addEventListener("touchmove", e => {
   if (!esSeleccionable(td)) return;
 
   arrastrando = true;
-
-  // Seleccionar rectángulo desde celdaInicio
   seleccionarRectangulo(td, true);
-
-  // Evitar scroll mientras arrastramos
-  e.preventDefault();
 }, { passive: false });
+
 
 tbody.addEventListener("touchend", e => {
   clearTimeout(touchTimer);
