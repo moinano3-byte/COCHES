@@ -1303,3 +1303,70 @@ document.addEventListener("keydown", e => {
   limpiarSeleccion(); // quitar azul automáticamente
 });
 };
+// ===== SELECCIÓN MÓVIL Y BOTONES ACCIONES =====
+const accionesMovil = document.getElementById("acciones-movil");
+let seleccion = new Set(); // celdas seleccionadas en móvil
+let celdaInicio = null;
+let modoSeleccionMovil = false;
+
+const tbody = document.querySelector("#cuadrante tbody");
+
+function mostrarAccionesMovil(x, y) {
+  accionesMovil.style.display = "flex";
+  accionesMovil.style.left = x + "px";
+  accionesMovil.style.top = y + "px";
+}
+
+// Ocultar acciones al tocar fuera
+document.addEventListener("click", (e) => {
+  if (!accionesMovil.contains(e.target)) {
+    accionesMovil.style.display = "none";
+    seleccion.forEach(td => td.classList.remove("seleccionada"));
+    seleccion.clear();
+  }
+});
+
+// Activar selección y mostrar botones al soltar
+tbody.addEventListener("touchstart", (e) => {
+  const td = e.target.closest("td");
+  if (!td || td.classList.contains("celda-no-interactiva")) return;
+
+  celdaInicio = td;
+  modoSeleccionMovil = true;
+  td.classList.add("seleccionada");
+  seleccion.add(td);
+});
+
+tbody.addEventListener("touchmove", (e) => {
+  if (!modoSeleccionMovil) return;
+  const touch = e.touches[0];
+  const element = document.elementFromPoint(touch.clientX, touch.clientY);
+  const td = element.closest("td");
+  if (td && !seleccion.has(td) && !td.classList.contains("celda-no-interactiva")) {
+    td.classList.add("seleccionada");
+    seleccion.add(td);
+  }
+});
+
+tbody.addEventListener("touchend", (e) => {
+  if (modoSeleccionMovil && seleccion.size > 0) {
+    const touch = e.changedTouches[0];
+    mostrarAccionesMovil(touch.clientX, touch.clientY);
+  }
+  modoSeleccionMovil = false;
+  celdaInicio = null;
+});
+
+// Manejar clic en botones de acciones
+accionesMovil.querySelectorAll("button").forEach(btn => {
+  btn.addEventListener("click", () => {
+    const estado = btn.dataset.estado;
+    seleccion.forEach(td => {
+      td.dataset.estado = estado;
+      td.classList.remove("seleccionada");
+      renderEstado(td);
+    });
+    seleccion.clear();
+    accionesMovil.style.display = "none";
+  });
+});
