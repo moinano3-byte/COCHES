@@ -1119,6 +1119,17 @@ function limpiarSeleccion() {
   seleccion.forEach(td => td.classList.remove("seleccionada"));
   seleccion.clear();
 }
+function mostrarAccionesMovil(x, y) {
+  accionesMovil.style.display = "flex";
+
+  const offset = 10; // separación del dedo
+  accionesMovil.style.left = x + offset + "px";
+  accionesMovil.style.top  = y + offset + "px";
+}
+
+function ocultarAccionesMovil() {
+  accionesMovil.style.display = "none";
+}
 
 /* Seleccionar rectángulo de celdas (Ctrl) */
 function seleccionarRectangulo(tdFin, mantener = false) {
@@ -1198,25 +1209,26 @@ tbody.addEventListener("touchstart", e => {
 
   celdaInicio = td;
   arrastrando = false;
+  modoSeleccionMovil = false;
 
   touchTimer = setTimeout(() => {
     modoSeleccionMovil = true;
-
-    // ⛔ bloquear scroll
-    document.body.classList.add("no-scroll");
-
     limpiarSeleccion();
+
     td.classList.add("seleccionada");
     seleccion.add(td);
-  }, 400);
+
+    const touch = e.touches[0];
+    mostrarAccionesMovil(touch.clientX, touch.clientY);
+  }, 300);
 }, { passive: true });
+
 
 
 tbody.addEventListener("touchmove", e => {
   if (!modoSeleccionMovil || !celdaInicio) return;
 
-  // ⛔ IMPRESCINDIBLE: evita scroll mientras arrastras
-  e.preventDefault();
+  e.preventDefault(); // 🚫 bloquear scroll SOLO al seleccionar
 
   const touch = e.touches[0];
   const elem = document.elementFromPoint(touch.clientX, touch.clientY);
@@ -1226,15 +1238,20 @@ tbody.addEventListener("touchmove", e => {
 
   arrastrando = true;
   seleccionarRectangulo(td, true);
-}, { passive: false }); // 🔥 CLAVE ABSOLUTA
+
+  // 👉 mover botones con el dedo
+  mostrarAccionesMovil(touch.clientX, touch.clientY);
+}, { passive: false });
+
 
 
 tbody.addEventListener("touchend", () => {
   clearTimeout(touchTimer);
 
-  // ✅ devolver scroll
-  document.body.classList.remove("no-scroll");
+  // 👉 ocultar botones al soltar
+  ocultarAccionesMovil();
 
+  // Tap corto → cambiar estado normal
   if (celdaInicio && !modoSeleccionMovil && !arrastrando) {
     celdaInicio.dataset.estado =
       (Number(celdaInicio.dataset.estado) + 1) % estados.length;
@@ -1242,10 +1259,11 @@ tbody.addEventListener("touchend", () => {
     recalcular();
   }
 
-  modoSeleccionMovil = false;
   celdaInicio = null;
   arrastrando = false;
+  modoSeleccionMovil = false;
 });
+
 
 
 
