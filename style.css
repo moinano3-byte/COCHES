@@ -312,10 +312,11 @@ td.seleccionada {
   bottom: 15px;
   left: 50%;
   transform: translateX(-50%);
-  display: flex;        /* 🔹 antes estaba "none" por defecto, mostrarlo con JS */
+  display: none;      /* 🔹 ocultos por defecto */
   gap: 12px;
   z-index: 9999;
 }
+
 
 #acciones-movil button {
   font-size: 48px;          /* icono grande */
