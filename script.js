@@ -1096,21 +1096,20 @@ recalcular();
   actualizarBotonMostrarColumnasOcultas(); // 🔥 ESTA FALTABA
   recalcular();
 }
-/* =========================================================
-   SELECCIÓN RECTANGULAR Y APLICAR ESTADO (RATÓN Y MÓVIL)
-========================================================= */
 
-const accionesMovil = document.getElementById("acciones-movil");
+/* =========================================================
+   SELECCIÓN RECTANGULAR Y APLICAR ESTADO
+========================================================= */
 
 let celdaInicio = null;
 let seleccion = new Set();
 let arrastrando = false;
-let modoSeleccionMovil = false;
 let touchTimer = null;
+let modoSeleccionMovil = false;
 
 /* Solo celdas que pueden cambiar de estado */
 function esSeleccionable(td) {
-  return td && td.tagName === "TD" &&
+  return td.tagName === "TD" &&
          td.classList.contains("viajero") &&
          !td.classList.contains("celda-no-interactiva");
 }
@@ -1121,27 +1120,13 @@ function limpiarSeleccion() {
   seleccion.clear();
 }
 
-/* Mostrar menú de acciones móviles */
-function mostrarAccionesMovil(x, y) {
-  accionesMovil.style.display = "flex";
-  const offset = 10; // separación del dedo
-  accionesMovil.style.left = x + offset + "px";
-  accionesMovil.style.top  = y + offset + "px";
-}
-
-/* Ocultar menú de acciones móviles */
-function ocultarAccionesMovil() {
-  accionesMovil.style.display = "none";
-}
-
+/* Seleccionar rectángulo de celdas (Ctrl) */
 function seleccionarRectangulo(tdFin, mantener = false) {
-  if (!celdaInicio || !tdFin) return;
   if (!mantener) limpiarSeleccion();
 
-  const filas = Array.from(tbody.rows); // SOLO filas del tbody
+  const filaIni = celdaInicio.parentElement.rowIndex;
+  const filaFin = tdFin.parentElement.rowIndex;
 
-  const filaIni = filas.indexOf(celdaInicio.parentElement);
-  const filaFin = filas.indexOf(tdFin.parentElement);
   const colIni = celdaInicio.cellIndex;
   const colFin = tdFin.cellIndex;
 
@@ -1151,10 +1136,12 @@ function seleccionarRectangulo(tdFin, mantener = false) {
   const cMax = Math.max(colIni, colFin);
 
   for (let f = fMin; f <= fMax; f++) {
-    const fila = filas[f];
+    const fila = tabla.rows[f];
+    if (!fila) continue;
+
     for (let c = cMin; c <= cMax; c++) {
       const td = fila.cells[c];
-      if (esSeleccionable(td)) {
+      if (td && esSeleccionable(td)) {
         td.classList.add("seleccionada");
         seleccion.add(td);
       }
@@ -1162,131 +1149,83 @@ function seleccionarRectangulo(tdFin, mantener = false) {
   }
 }
 
-
-/* =========================================================
-   SELECCIÓN CON RATÓN (PC) — COMPORTAMIENTO CORRECTO
-========================================================= */
-
+/* ===== MOUSE ===== */
 tbody.addEventListener("mousedown", e => {
-  const td = e.target.closest("td");
-  if (!esSeleccionable(td)) return;
+  if (!esSeleccionable(e.target)) return;
 
-  e.stopPropagation();
-  e.preventDefault();
-
+  // Limpiar cualquier selección anterior siempre que sea click normal
   if (!e.ctrlKey) limpiarSeleccion();
 
-  celdaInicio = td;
-  arrastrando = false;
+  celdaInicio = e.target;
+  arrastrando = false; // aún no arrastramos
+
+  if (e.ctrlKey) {
+    // Ctrl + click → solo selección visual
+    seleccionarRectangulo(celdaInicio, true);
+    e.preventDefault();
+  }
 });
 
 tbody.addEventListener("mousemove", e => {
-  if (!celdaInicio) return;
-
-  // Obtener la celda real bajo el cursor
-  const elementos = document.elementsFromPoint(e.clientX, e.clientY);
-  const td = elementos.find(el => esSeleccionable(el));
-  if (!td) return;
-
+  if (!celdaInicio || !esSeleccionable(e.target)) return;
   arrastrando = true;
-
-  seleccionarRectangulo(td, false);
+  seleccionarRectangulo(e.target, e.ctrlKey); // arrastre visual
 });
 
-
 tbody.addEventListener("mouseup", e => {
-  e.stopPropagation(); // 🔑 CLAVE
+  if (!esSeleccionable(e.target)) return;
 
-  if (!celdaInicio) return;
-
-  // Siempre usar celdaInicio
-  const td = celdaInicio;
-  if (!esSeleccionable(td)) {
-    celdaInicio = null;
-    arrastrando = false;
-    return;
-  }
-
-  // Click simple (sin arrastrar)
-  if (!arrastrando && !e.ctrlKey) {
-    // Rotar estado: 0 → 1 → 2 → 3 → 0
-    let nuevoEstado = (Number(td.dataset.estado) + 1) % estados.length;
-    td.dataset.estado = nuevoEstado;
+  if (!e.ctrlKey && !arrastrando) {
+    // Click normal sin arrastre → cambiar estado
+    const td = e.target;
+    td.dataset.estado = (Number(td.dataset.estado) + 1) % estados.length;
     renderEstado(td);
+
     recalcular();
   }
 
-  // Reset
+  // Reiniciar flags
   celdaInicio = null;
   arrastrando = false;
 });
-
 /* =========================================================
-   SELECCIÓN TÁCTIL (MÓVIL) DEFINITIVA
+   SELECCIÓN TÁCTIL (MÓVIL)
 ========================================================= */
+
 tbody.addEventListener("touchstart", e => {
-  // 🔑 Pinch / zoom → cancelar totalmente
-  if (e.touches.length > 1) {
-        celdaInicio = null;
-    modoSeleccionMovil = false;
-    return;
-  }
-
   const td = e.target.closest("td");
-  if (!esSeleccionable(td)) return;
-
-  e.preventDefault();                 // 🔑 evita scroll / refresh
-  document.body.classList.add("no-scroll");
+  if (!td || !esSeleccionable(td)) return;
 
   celdaInicio = td;
   arrastrando = false;
-  modoSeleccionMovil = false;
 
   touchTimer = setTimeout(() => {
     modoSeleccionMovil = true;
     limpiarSeleccion();
     td.classList.add("seleccionada");
     seleccion.add(td);
-  }, 300);
-}, { passive: false });
+  }, 400);
+}, { passive: true });
 
 
 tbody.addEventListener("touchmove", e => {
-  if (!celdaInicio) return;
-
-  // 🔑 Si aparece pinch, cancelar selección
-  if (e.touches.length > 1) {
-    e.preventDefault();
-    celdaInicio = null;
-    modoSeleccionMovil = false;
-    document.body.classList.remove("no-scroll");
-    return;
-  }
-
-  e.preventDefault(); // 🔑 bloquea scroll SIEMPRE durante drag
+  if (!modoSeleccionMovil || !celdaInicio) return;
 
   const touch = e.touches[0];
   const elem = document.elementFromPoint(touch.clientX, touch.clientY);
   const td = elem?.closest("td");
-  if (!esSeleccionable(td)) return;
+
+  if (!td || !esSeleccionable(td)) return;
 
   arrastrando = true;
   seleccionarRectangulo(td, true);
-}, { passive: false });
+});
 
 
-tbody.addEventListener("touchend", e => {
+tbody.addEventListener("touchend", () => {
   clearTimeout(touchTimer);
-  document.body.classList.remove("no-scroll");
 
-  if (!celdaInicio) return;
-
-  const touch = e.changedTouches[0];
-
-  if ((modoSeleccionMovil || arrastrando) && seleccion.size > 0) {
-    mostrarAccionesMovil(touch.clientX, touch.clientY);
-  } else if (!arrastrando) {
-    // Tap corto
+  if (celdaInicio && !modoSeleccionMovil && !arrastrando) {
     celdaInicio.dataset.estado =
       (Number(celdaInicio.dataset.estado) + 1) % estados.length;
     renderEstado(celdaInicio);
@@ -1295,70 +1234,62 @@ tbody.addEventListener("touchend", e => {
 
   celdaInicio = null;
   arrastrando = false;
-  modoSeleccionMovil = false;
 });
+const accionesMovil = document.getElementById("acciones-movil");
+
+if (esMovil) {
+  accionesMovil.style.display = "flex";
+}
+accionesMovil.addEventListener("click", e => {
+  const btn = e.target.closest("button");
+  if (!btn) return;
+
+  const estado = btn.dataset.estado;
+
+  seleccion.forEach(td => {
+    td.dataset.estado = estado;
+    renderEstado(td);
+  });
+
+  recalcular();
+  limpiarSeleccion();
+});
+document.addEventListener("touchend", () => {
+  if (!accionesMovil) return;
+
+  accionesMovil.style.position = "fixed";
+  accionesMovil.style.left = "50%";
+  accionesMovil.style.bottom = "15px";
+  accionesMovil.style.top = "auto";
+  accionesMovil.style.transform = "translateX(-50%)";
+});
+
+
 
 
 /* =========================================================
    TECLAS PARA CAMBIAR ESTADO
 ========================================================= */
 document.addEventListener("keydown", e => {
-  if (seleccion.size === 0) return;
+  if (seleccion.size === 0) return; // nada seleccionado → no hace nada
 
-  let nuevoEstado = null;
+  let estado = null;
 
-  if (e.key === "p" || e.key === "P") {
-    nuevoEstado = "2"; // 👤
-  } else if (e.key === "c" || e.key === "C") {
-    nuevoEstado = "3"; // 🚗
-  } else if (e.key === "-") {
-    nuevoEstado = "1"; // -
-  } else if (e.key === "Delete" || e.key === "Backspace") {
-    nuevoEstado = "0"; // vaciar
-  } else if (e.key === " " || e.key === "Spacebar") { // espacio
-    nuevoEstado = "0"; // vaciar
-    e.preventDefault(); // 🔑 evitar que la página haga scroll
-  }
+  if (e.key === "-") estado = 1;       // "-"
+  else if (e.key.toLowerCase() === "v") estado = 2; // "M"
+  else if (e.key.toLowerCase() === "c") estado = 3; // "M-C"
+  else if (e.code === "Space") { estado = 0; e.preventDefault(); } // vacío
+  else return;
 
-  if (nuevoEstado === null) return;
-
+  // Aplicar a todas las celdas seleccionadas
   seleccion.forEach(td => {
-    td.dataset.estado = nuevoEstado;
+    if (!esSeleccionable(td)) return;
+    td.dataset.estado = estado;
     renderEstado(td);
+
   });
 
   recalcular();
+  limpiarSeleccion(); // quitar azul automáticamente
 });
-
-
-
-/* =========================================================
-   BOTONES DE ACCIONES MÓVILES
-========================================================= */
-accionesMovil.querySelectorAll("button").forEach(btn => {
-  btn.addEventListener("click", () => {
-    const estado = Number(btn.dataset.estado);
-    seleccion.forEach(td => {
-      td.dataset.estado = estado;
-      td.classList.remove("seleccionada");
-      renderEstado(td);
-    });
-    limpiarSeleccion();
-    ocultarAccionesMovil();
-    recalcular();
-  });
-});
-
-// Ocultar acciones y limpiar selección al hacer click FUERA
-document.addEventListener("click", e => {
-  // Click dentro de la tabla → NO limpiar selección
-  if (tbody.contains(e.target)) return;
-
-  // Click dentro del menú móvil → NO cerrar
-  if (accionesMovil.contains(e.target)) return;
-
-  limpiarSeleccion();
-  ocultarAccionesMovil();
-});
-
-} // <-- cierre de generarCuadrante
+};
