@@ -316,28 +316,38 @@ td.seleccionada {
   z-index: 9999;
 }
 
-
-
+/* BOTONES */
 #acciones-movil button {
+  all: unset;                 /* 🔥 limpia estilos del navegador */
+  width: 96px;
+  height: 96px;
+  border-radius: 20px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border: 2px solid #aaa;
+  background: #f0f0f0;
+
   position: relative;
-  overflow: visible;   /* 🔥 FALTABA */
+  cursor: pointer;
+  box-sizing: border-box;
 }
 
+/* ICONOS */
 #acciones-movil img {
-  display: block;      /* 🔥 CLAVE */
-  position: relative;  /* 🔥 CLAVE */
-  z-index: 2;          /* 🔥 CLAVE */
   width: 48px;
   height: 48px;
+  display: block;
+  pointer-events: none;
 }
 
-
+/* EFECTO PULSACIÓN */
 #acciones-movil button:active {
-  transform: scale(0.92);    /* efecto al presionar */
+  transform: scale(0.92);
   background: #dfe9f3;
 }
-
-
 
 
 
