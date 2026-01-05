@@ -322,7 +322,7 @@ td.seleccionada {
   box-sizing: border-box;
 
   width: 96px;
-  height: 96px;
+  height: 30px;
 
   display: flex;
   align-items: center;
