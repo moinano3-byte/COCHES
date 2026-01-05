@@ -319,19 +319,22 @@ td.seleccionada {
 
 
 #acciones-movil button {
-  font-size: 48px;          /* icono grande */
-  width: 96px;               /* botón cuadrado */
-  height: 96px;              /* botón cuadrado */
-  border-radius: 20px;       /* esquinas suaves */
+  font-size: 0;              /* 🔥 QUITA emojis/texto */
+  position: relative;        /* 🔥 ancla para los PNG */
+
+  width: 96px;
+  height: 96px;
+  border-radius: 20px;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 0;                /* quitar padding que deformaba */
+  padding: 0;
   cursor: pointer;
-  border: 2px solid #aaa;    /* marco visible */
-  background: #f0f0f0;       /* fondo gris suave */
+  border: 2px solid #aaa;
+  background: #f0f0f0;
   transition: transform 0.1s ease;
 }
+
 
 #acciones-movil button:active {
   transform: scale(0.92);    /* efecto al presionar */
