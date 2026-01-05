@@ -282,40 +282,40 @@ td.seleccionada {
 
 
 
-
 /* 🖼️ VOLANTE */
 .icono-volante {
   position: absolute;
-
-  inset: 0;             /* 🔥 ocupa exactamente la celda */
+  inset: 0;
   margin: auto;
-
-  height: 2.5em;        /* puede sobresalir */
+  height: 2.5em;
   width: auto;
-
   pointer-events: none;
 }
 
+/* CONTENEDOR */
 .viajero {
-  height: 30px;
-  min-height: 30px;
-  max-height: 30px;
-
+  height: 36px;
+  min-height: 36px;
   position: relative;
-  text-align: center;
-  vertical-align: middle;
-
-  overflow: visible;   /* 🔥 CLAVE FINAL */
+  overflow: visible;
 }
+
+/* IMÁGENES DENTRO */
+.viajero img {
+  display: block;
+}
+
+/* MENÚ MÓVIL */
 #acciones-movil {
   position: fixed;
   bottom: 15px;
   left: 50%;
   transform: translateX(-50%);
-  display: none;      /* 🔹 ocultos por defecto */
+  display: none;
   gap: 12px;
   z-index: 9999;
 }
+
 
 
 #acciones-movil button {
