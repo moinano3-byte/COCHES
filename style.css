@@ -334,11 +334,32 @@ td.seleccionada {
   background: #f0f0f0;
   transition: transform 0.1s ease;
 }
+#acciones-movil img {
+  width: 48px;
+  height: 48px;
+  pointer-events: none; /* el click es del botón */
+}
 
 
 #acciones-movil button:active {
   transform: scale(0.92);    /* efecto al presionar */
   background: #dfe9f3;
+}
+/* LIMPIAR ICONOS FANTASMA EN ACCIONES MÓVIL */
+#acciones-movil button::before,
+#acciones-movil button::after {
+  content: none !important;
+}
+
+#acciones-movil button {
+  background-image: none !important;
+  font-size: 0 !important;
+}
+
+#acciones-movil img {
+  width: 48px;
+  height: 48px;
+  pointer-events: none;
 }
 
 
