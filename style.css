@@ -314,43 +314,41 @@ td.seleccionada {
   display: none;
   gap: 12px;
   z-index: 9999;
-  height: 96px;              /* 🔒 altura real */
 }
 
-/* ===== BOTONES CUADRADOS NORMALES ===== */
+/* ===== BOTONES CUADRADOS ===== */
 #acciones-movil button {
-  all: initial;              /* ⚠️ NO unset */
+  all: unset;
   box-sizing: border-box;
 
   width: 96px;
   height: 96px;
-  min-height: 96px;
-  max-height: 96px;
 
   display: flex;
   align-items: center;
   justify-content: center;
-
-  padding: 0;
-  margin: 0;
 
   border-radius: 20px;
   border: 2px solid #aaa;
   background: #f0f0f0;
 
   cursor: pointer;
-  line-height: 1;            /* 🔥 CLAVE */
+  overflow: hidden;        /* 🔒 evita desbordes del PNG */
 }
 
-/* ICONOS */
+/* ===== ICONOS PNG ===== */
 #acciones-movil img {
-  width: 48px;
-  height: 48px;
+  max-width: 70%;
+  max-height: 70%;
+  width: auto;
+  height: auto;
+
+  object-fit: contain;
   display: block;
   pointer-events: none;
 }
 
-/* EFECTO PULSACIÓN */
+/* ===== EFECTO PULSACIÓN ===== */
 #acciones-movil button:active {
   transform: scale(0.92);
   background: #dfe9f3;
