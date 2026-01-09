@@ -1393,9 +1393,11 @@ tbody.addEventListener("touchend", e => {
 
   // Mostrar botones solo si hay selección
 if (seleccion.size > 0) {
+  actualizarBotonesMovil();   // 🔹 asegura que se creen con tu X e imágenes
   posicionarAccionesMovil();
   botonesMovil.style.display = "flex";
 }
+
 
 
 
@@ -1448,12 +1450,7 @@ function posicionarAccionesMovil() {
 function actualizarBotonesMovil() {
   botonesMovil.innerHTML = ""; // limpiar antes
 
-  // Estado vacío → X
-  const btnVacio = document.createElement("button");
-  btnVacio.dataset.estado = "0";
-  btnVacio.textContent = "X";
-  btnVacio.className = "boton-movil-estado";
-  botonesMovil.appendChild(btnVacio);
+
 
   // Estado M → persona.png
   const btnPersona = document.createElement("button");
@@ -1478,6 +1475,12 @@ function actualizarBotonesMovil() {
   imgVolante.style.height = "30px";
   btnVolante.appendChild(imgVolante);
   botonesMovil.appendChild(btnVolante);
+    // Estado vacío → X
+  const btnVacio = document.createElement("button");
+  btnVacio.dataset.estado = "0";
+  btnVacio.textContent = "X";
+  btnVacio.className = "boton-movil-estado";
+  botonesMovil.appendChild(btnVacio);
 }
 
 
