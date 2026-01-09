@@ -149,9 +149,10 @@ function generarCuadrante() {
 /* =========================================================
    ===== CONFIGURACIÓN GENERAL
    ========================================================= */
-
 const tabla = document.getElementById("cuadrante");
 const tbody = tabla.querySelector("tbody");
+
+
 
 const estados = ["", "-", "M", "M-C"];
 // índices:        0   1    2     3
@@ -306,8 +307,6 @@ tabla.insertBefore(trBotones, tbody);
   let fecha = new Date(fechaInicio);
   fecha.setDate(fecha.getDate() - ((fecha.getDay() + 6) % 7));
 
-  while (fecha <= fechaFin) {
-
     while (fecha <= fechaFin) {
 
       
@@ -409,46 +408,120 @@ tbody.appendChild(trMes);
 /* ===== BLOQUE MENSUAL ===== */
 if (fecha.getMonth() !== mesActual) {
 
-  // Crear fila COCHES
+  // 1️⃣ Fila COCHES
   const trCoches = crearFilaResumen("COCHES");
   tbody.appendChild(trCoches);
 
-  // ===== AÑADIR TEXTO + BOTÓN EN LA PRIMERA CELDA =====
-  const tdPrimera = trCoches.children[0]; // primera celda de la fila COCHES
-  tdPrimera.textContent = "COCHE ";       // texto fijo
+  const tdPrimeraCoche = trCoches.children[0];
+  tdPrimeraCoche.textContent = "COCHE ";
 
+  // Botón 🚗 Coche mes
   const btnCoche = document.createElement("button");
   btnCoche.className = "boton-mes-coche";
-  btnCoche.innerHTML = "🚗";
   btnCoche.title = "Mes anterior";
-
   btnCoche.onclick = () => {
-  const infoMes = obtenerBloqueMesDesdeBoton(btnCoche);
-  console.log(infoMes);
-};
+    const infoMes = obtenerBloqueMesDesdeBoton(btnCoche);
+    console.log("Botón coche activado para mes:", infoMes);
+  };
 
-// 🔹 Permitir que el click llegue
-tdPrimera.style.pointerEvents = "auto";
-btnCoche.style.pointerEvents = "auto";
+  const imgVolante = document.createElement("img");
+  imgVolante.src = "volante.png"; // ruta de tu imagen
+  imgVolante.alt = "Coche";
+  imgVolante.className = "overlay-volante";
+  btnCoche.appendChild(imgVolante);
 
-tdPrimera.appendChild(btnCoche);
+  tdPrimeraCoche.style.pointerEvents = "auto";
+  btnCoche.style.pointerEvents = "auto";
+  tdPrimeraCoche.appendChild(btnCoche);
 
+  // 2️⃣ Fila PERSONAS
+  const trPersonas = crearFilaResumen("PERSONAS");
+  tbody.appendChild(trPersonas);
 
-  // Crear el resto de filas del bloque mensual
-  tbody.appendChild(crearFilaResumen("PERSONAS"));
-  tbody.appendChild(crearFilaResumen("PORCENTAJE"));
-  tbody.appendChild(crearSeparadorFino());
+  const tdPrimeraPersonas = trPersonas.children[0];
+  tdPrimeraPersonas.textContent = "PERSONAS ";
 
-  mesActual = fecha.getMonth();
+  // Botón de mes – transforma M-C en M
+  const btnPersona = document.createElement("button");
+  btnPersona.className = "boton-mes-persona";
+  btnPersona.title = "Transformar M-C en M del mes";
+
+  const imgPersona = document.createElement("img");
+  imgPersona.src = "persona.png";
+  imgPersona.alt = "Persona";
+  imgPersona.className = "overlay-persona";
+
+  btnPersona.appendChild(imgPersona);
+
+  // 🔹 FUNCIONALIDAD DEL BOTÓN
+  btnPersona.onclick = () => {
+    // Función que detecta automáticamente fila COCHES o PERSONAS según el botón
+    function obtenerBloqueMesDesdeBotonGenerico(btn) {
+      const trBoton = btn.closest("tr");
+      if (!trBoton) return null;
+
+      const tipoFila = trBoton.dataset.tipo;
+      if (tipoFila !== "COCHES" && tipoFila !== "PERSONAS") return null;
+
+      const filas = [...tbody.querySelectorAll("tr")];
+      const indexFila = filas.indexOf(trBoton);
+
+      // Buscar hacia arriba la fila PORCENTAJE
+      let filaPorcentaje = null;
+      for (let i = indexFila; i >= 0; i--) {
+        const tr = filas[i];
+        if (tr.dataset.tipo === "PORCENTAJE" || tr.children[tr.children.length - 1].textContent.trim() === "PORCENTAJE") {
+          filaPorcentaje = tr;
+          break;
+        }
+      }
+
+      // Recoger filas de días del mes (desde filaPorcentaje + 1 hasta fila del botón)
+      const filasDia = [];
+      for (let i = filas.indexOf(filaPorcentaje) + 1; i < indexFila; i++) {
+        if (filas[i].dataset.tipo === "dia") {
+          filasDia.push(filas[i]);
+        }
+      }
+
+      return {
+        filaPorcentaje,
+        filaBoton: trBoton,
+        filasDia
+      };
+    }
+
+    const infoMes = obtenerBloqueMesDesdeBotonGenerico(btnPersona);
+    if (!infoMes) return;
+
+    // Transformar M-C (estado 3) en M (estado 2)
+    infoMes.filasDia.forEach(tr => {
+      for (let i = 1; i <= columnasPersonas; i++) {
+        const td = tr.children[i];
+        if (td.dataset.estado === "3") {
+          td.dataset.estado = "2";
+          renderEstado(td);
+        }
+      }
+    });
+
+    recalcular();
+    console.log("✔ Todos los M-C del mes transformados en M");
+  };
+
+  
+tdPrimeraPersonas.appendChild(btnPersona);
+
+// 3️⃣ Fila PORCENTAJE y separador fino
+tbody.appendChild(crearFilaResumen("PORCENTAJE"));
+tbody.appendChild(crearSeparadorFino());
+
+// 4️⃣ Actualizar mes actual
+mesActual = fecha.getMonth();
 }
 
-
-
-    }
-  } 
-  
   // ✅ CIERRE DEL WHILE
-
+}
   /* =========================================================
      ===== BLOQUEO ADICIONAL: filas sin fecha a los lados
      ========================================================= */
@@ -689,6 +762,8 @@ renderEstado(tdBaja);
   recalcular();
   console.log("✔ Convergencia global mensual real, acumulando porcentajes, sin romper reglas");
 });
+
+
 
 /* =========================================================
    ===== FASE 2 – BOTÓN MENSUAL (LECTURA)
@@ -1104,14 +1179,13 @@ recalcular();
 let celdaInicio = null;
 let seleccion = new Set();
 let arrastrando = false;
-let touchTimer = null;
-let modoSeleccionMovil = false;
 
 /* Solo celdas que pueden cambiar de estado */
 function esSeleccionable(td) {
-  return td.tagName === "TD" &&
-         td.classList.contains("viajero") &&
-         !td.classList.contains("celda-no-interactiva");
+  return td &&
+    td.tagName === "TD" &&
+    td.classList.contains("viajero") &&
+    !td.classList.contains("celda-no-interactiva");
 }
 
 /* Limpiar selección visual */
@@ -1120,20 +1194,21 @@ function limpiarSeleccion() {
   seleccion.clear();
 }
 
-/* Seleccionar rectángulo de celdas (Ctrl) */
-function seleccionarRectangulo(tdFin, mantener = false) {
-  if (!mantener) limpiarSeleccion();
+/* Seleccionar rectángulo de celdas */
+function seleccionarRectangulo(tdFin) {
+  if (!celdaInicio) return;
 
   const filaIni = celdaInicio.parentElement.rowIndex;
   const filaFin = tdFin.parentElement.rowIndex;
-
-  const colIni = celdaInicio.cellIndex;
-  const colFin = tdFin.cellIndex;
+  const colIni  = celdaInicio.cellIndex;
+  const colFin  = tdFin.cellIndex;
 
   const fMin = Math.min(filaIni, filaFin);
   const fMax = Math.max(filaIni, filaFin);
   const cMin = Math.min(colIni, colFin);
   const cMax = Math.max(colIni, colFin);
+
+  limpiarSeleccion();
 
   for (let f = fMin; f <= fMax; f++) {
     const fila = tabla.rows[f];
@@ -1141,7 +1216,7 @@ function seleccionarRectangulo(tdFin, mantener = false) {
 
     for (let c = cMin; c <= cMax; c++) {
       const td = fila.cells[c];
-      if (td && esSeleccionable(td)) {
+      if (esSeleccionable(td)) {
         td.classList.add("seleccionada");
         seleccion.add(td);
       }
@@ -1149,55 +1224,121 @@ function seleccionarRectangulo(tdFin, mantener = false) {
   }
 }
 
-/* ===== MOUSE ===== */
+/* ===================== VARIABLES ===================== */
+let arrastreReciente = false; // <-- NUEVO
+
+/* ===================== MOUSE ===================== */
+
 tbody.addEventListener("mousedown", e => {
-  if (!esSeleccionable(e.target)) return;
+  const td = e.target.closest("td");
+  if (!esSeleccionable(td)) return;
 
-  // Limpiar cualquier selección anterior siempre que sea click normal
-  if (!e.ctrlKey) limpiarSeleccion();
+  document.body.focus();
 
-  celdaInicio = e.target;
-  arrastrando = false; // aún no arrastramos
+  limpiarSeleccion();
+  celdaInicio = td;
+  arrastrando = false;
 
-  if (e.ctrlKey) {
-    // Ctrl + click → solo selección visual
-    seleccionarRectangulo(celdaInicio, true);
-    e.preventDefault();
-  }
+  td.classList.add("seleccionada");
+  seleccion.add(td);
 });
 
 tbody.addEventListener("mousemove", e => {
-  if (!celdaInicio || !esSeleccionable(e.target)) return;
+  if (!celdaInicio) return;
+  const td = e.target.closest("td");
+  if (!esSeleccionable(td)) return;
+
   arrastrando = true;
-  seleccionarRectangulo(e.target, e.ctrlKey); // arrastre visual
+  arrastreReciente = true; // <-- Indica que se está haciendo drag
+  seleccionarRectangulo(td);
 });
 
 tbody.addEventListener("mouseup", e => {
-  if (!esSeleccionable(e.target)) return;
-
-  if (!e.ctrlKey && !arrastrando) {
-    // Click normal sin arrastre → cambiar estado
-    const td = e.target;
-    td.dataset.estado = (Number(td.dataset.estado) + 1) % estados.length;
-    renderEstado(td);
-
-    recalcular();
-  }
-
-  // Reiniciar flags
   celdaInicio = null;
   arrastrando = false;
+
+  // Solo por seguridad, el drag reciente durará un instante
+  setTimeout(() => { arrastreReciente = false; }, 0);
 });
+
+tbody.addEventListener("click", e => {
+  const td = e.target.closest("td");
+  if (!esSeleccionable(td)) return;
+
+  if (arrastrando || seleccion.size !== 1 || !seleccion.has(td)) return;
+
+  const actual = Number(td.dataset.estado || 0);
+  const nuevo = (actual + 1) % estados.length;
+
+  td.dataset.estado = String(nuevo);
+  renderEstado(td);
+  recalcular();
+});
+
+/* ===================== DESELECCIONAR CON CUALQUIER CLICK ===================== */
+document.addEventListener("click", e => {
+  if (seleccion.size === 0) return;
+
+  // Si acabamos de hacer un arrastre, no borrar selección
+  if (arrastreReciente) return;
+
+  limpiarSeleccion();
+});
+
+
 /* =========================================================
-   SELECCIÓN TÁCTIL (MÓVIL)
+   TECLAS PARA CAMBIAR ESTADO
 ========================================================= */
 
+document.body.tabIndex = -1;
+document.body.focus();
+
+window.addEventListener("keydown", e => {
+
+  console.log("KEY DETECTADA:", e.key);
+
+  if (seleccion.size === 0) return;
+
+  let estado = null;
+  const k = e.key.toLowerCase();
+
+  if (k === "-") estado = "1";
+  else if (k === "v") estado = "2";   // M
+  else if (k === "c") estado = "3";   // M-C
+  else if (e.code === "Space") {
+    estado = "0";
+    e.preventDefault();
+  } else return;
+
+  seleccion.forEach(td => {
+    if (!esSeleccionable(td)) return;
+    td.dataset.estado = estado; // 🔑 STRING
+    renderEstado(td);
+  });
+
+  recalcular();
+});
+
+/* =========================================================
+   SELECCIÓN TÁCTIL (MÓVIL) – Ignora múltiples dedos y scroll natural
+========================================================= */
+
+let startY = 0;
+let startScroll = 0;
+
 tbody.addEventListener("touchstart", e => {
+  if (e.touches.length !== 1) {
+    modoSeleccionMovil = false;
+    return; // ignorar multitouch
+  }
+
   const td = e.target.closest("td");
   if (!td || !esSeleccionable(td)) return;
 
   celdaInicio = td;
   arrastrando = false;
+  startY = e.touches[0].clientY;
+  startScroll = window.scrollY;
 
   touchTimer = setTimeout(() => {
     modoSeleccionMovil = true;
@@ -1207,45 +1348,63 @@ tbody.addEventListener("touchstart", e => {
   }, 400);
 }, { passive: true });
 
-
 tbody.addEventListener("touchmove", e => {
-  if (!modoSeleccionMovil || !celdaInicio) return;
+  // 🔹 Si hay más de un dedo, no hacemos nada → pinch zoom sigue activo
+  if (e.touches.length !== 1 || !celdaInicio) return;
 
   const touch = e.touches[0];
   const elem = document.elementFromPoint(touch.clientX, touch.clientY);
   const td = elem?.closest("td");
-
   if (!td || !esSeleccionable(td)) return;
 
   arrastrando = true;
   seleccionarRectangulo(td, true);
-});
+
+  const MARGIN = 50; // px para activar scroll
+  const speed = 5;
+
+  const top = touch.clientY;
+  const bottom = window.innerHeight - top;
+
+  // 🔹 Bloquear scroll nativo solo para 1 dedo
+  e.preventDefault();
+
+  // Scroll personalizado solo al borde
+  if (top <= MARGIN) window.scrollBy({ top: -speed, behavior: "smooth" });
+  else if (bottom <= MARGIN) window.scrollBy({ top: speed, behavior: "smooth" });
+}, { passive: false });
 
 
-tbody.addEventListener("touchend", () => {
+
+tbody.addEventListener("touchend", e => {
+  if (e.touches.length > 0) return; // ignorar multi-touch
+
   clearTimeout(touchTimer);
 
+  // Click rápido → cambiar estado
   if (celdaInicio && !modoSeleccionMovil && !arrastrando) {
-    celdaInicio.dataset.estado =
-      (Number(celdaInicio.dataset.estado) + 1) % estados.length;
+    celdaInicio.dataset.estado = (Number(celdaInicio.dataset.estado) + 1) % estados.length;
     renderEstado(celdaInicio);
     recalcular();
   }
 
+  // Mostrar botones solo si hay selección
+if (seleccion.size > 0) {
+  posicionarAccionesMovil();
+  botonesMovil.style.display = "flex";
+}
+
+
+
   celdaInicio = null;
   arrastrando = false;
+  modoSeleccionMovil = false;
 });
-const accionesMovil = document.getElementById("acciones-movil");
-
-if (esMovil) {
-  accionesMovil.style.display = "flex";
-}
-accionesMovil.addEventListener("click", e => {
+botonesMovil.addEventListener("click", e => {
   const btn = e.target.closest("button");
   if (!btn) return;
 
   const estado = btn.dataset.estado;
-
   seleccion.forEach(td => {
     td.dataset.estado = estado;
     renderEstado(td);
@@ -1253,43 +1412,10 @@ accionesMovil.addEventListener("click", e => {
 
   recalcular();
   limpiarSeleccion();
-});
-document.addEventListener("touchend", () => {
-  if (!accionesMovil) return;
 
-  accionesMovil.style.position = "fixed";
-  accionesMovil.style.left = "50%";
-  accionesMovil.style.bottom = "15px";
-  accionesMovil.style.top = "auto";
-  accionesMovil.style.transform = "translateX(-50%)";
+  botonesMovil.style.display = "none";
 });
 
 
-
-
-/* =========================================================
-   TECLAS PARA CAMBIAR ESTADO
-========================================================= */
-document.addEventListener("keydown", e => {
-  if (seleccion.size === 0) return; // nada seleccionado → no hace nada
-
-  let estado = null;
-
-  if (e.key === "-") estado = 1;       // "-"
-  else if (e.key.toLowerCase() === "v") estado = 2; // "M"
-  else if (e.key.toLowerCase() === "c") estado = 3; // "M-C"
-  else if (e.code === "Space") { estado = 0; e.preventDefault(); } // vacío
-  else return;
-
-  // Aplicar a todas las celdas seleccionadas
-  seleccion.forEach(td => {
-    if (!esSeleccionable(td)) return;
-    td.dataset.estado = estado;
-    renderEstado(td);
-
-  });
-
-  recalcular();
-  limpiarSeleccion(); // quitar azul automáticamente
-});
 };
+
