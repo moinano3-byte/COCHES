@@ -307,16 +307,17 @@ td.seleccionada {
 
   overflow: visible;   /* 🔥 CLAVE FINAL */
 }
-/* ===== BOTONES MÓVIL RENOMBRADOS ===== */
+
+/* BOTONES MÓVIL */
 #botones-movil {
-  position: absolute;          /* relativo a la tabla */
-  display: none;               /* se muestra solo al seleccionar */
+  display: none; /* ocultos por defecto */
+  position: absolute;
   gap: 8px;
-  background: rgba(255,255,255,0.95);
+  background: rgba(255, 255, 255, 0.95);
   padding: 8px;
   border-radius: 12px;
   box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-  z-index: 2000;               /* encima de todo */
+  z-index: 2000;
   flex-wrap: wrap;
 }
 
@@ -332,6 +333,7 @@ td.seleccionada {
   align-items: center;
   justify-content: center;
 }
+
 
 
 
