@@ -151,21 +151,9 @@ function generarCuadrante() {
    ========================================================= */
 
 const tabla = document.getElementById("cuadrante");
-/* ===============================
-   BLOQUEO GESTOS NATIVOS MÓVIL
-   (SIN romper el zoom)
-   =============================== */
+// Permitir pinch-zoom del navegador
+tabla.style.touchAction = "pan-x pan-y pinch-zoom";
 
-tabla.style.touchAction = "pinch-zoom";   // 🔥 permite zoom con 2 dedos
-
-["touchstart", "touchmove"].forEach(evento => {
-  tabla.addEventListener(evento, e => {
-    if (e.touches.length === 1) {
-      e.preventDefault();   // 🔥 1 dedo → no scroll, no refresh
-    }
-    // 2 dedos → NO se bloquea → zoom permitido
-  }, { passive: false });
-});
 
 const tbody = tabla.querySelector("tbody");
 const botonesMovil = document.getElementById("botones-movil");
@@ -1198,6 +1186,9 @@ recalcular();
 let celdaInicio = null;
 let seleccion = new Set();
 let arrastrando = false;
+let touchStartX = 0;
+let touchStartY = 0;
+let modoSeleccionTactil = false;
 
 /* Solo celdas que pueden cambiar de estado */
 function esSeleccionable(td) {
@@ -1293,6 +1284,21 @@ tbody.addEventListener("click", e => {
   renderEstado(td);
   recalcular();
 });
+tbody.addEventListener("touchstart", e => {
+  const touch = e.touches[0];
+  const td = e.target.closest("td");
+
+  touchStartX = touch.clientX;
+  touchStartY = touch.clientY;
+  modoSeleccionTactil = false;
+
+  if (esSeleccionable(td)) {
+    celdaInicio = td;
+    limpiarSeleccion();
+    td.classList.add("seleccionada");
+    seleccion.add(td);
+  }
+}, { passive: true });
 
 /* ===================== DESELECCIONAR CON CUALQUIER CLICK ===================== */
 document.addEventListener("click", e => {
@@ -1372,9 +1378,16 @@ tbody.addEventListener("touchmove", e => {
   if (e.touches.length !== 1 || !celdaInicio) return;
 
   const touch = e.touches[0];
+
+  // 🔥 Si todavía no estamos en modo selección, dejamos que el navegador haga scroll
+  if (!modoSeleccionMovil) return;
+
   const elem = document.elementFromPoint(touch.clientX, touch.clientY);
   const td = elem?.closest("td");
   if (!td || !esSeleccionable(td)) return;
+
+  // 🔥 A partir de aquí sí estamos seleccionando
+  e.preventDefault();   // bloquear scroll SOLO mientras se selecciona
 
   arrastrando = true;
   seleccionarRectangulo(td, true);
@@ -1385,8 +1398,6 @@ tbody.addEventListener("touchmove", e => {
   const top = touch.clientY;
   const bottom = window.innerHeight - top;
 
-  // 🔹 Bloquear scroll nativo solo para 1 dedo
-  e.preventDefault();
 
   // Scroll personalizado solo al borde
   if (top <= MARGIN) window.scrollBy({ top: -speed, behavior: "smooth" });
@@ -1509,12 +1520,5 @@ function actualizarBotonesMovil() {
   botonesMovil.appendChild(btnX);
 }
 
-document.addEventListener("touchmove", function (e) {
-  // Si es pinch (2 o más dedos) → permitir
-  if (e.touches.length > 1) return;
-
-  // Un solo dedo → bloquear scroll
-  e.preventDefault();
-}, { passive: false });
 
 }
