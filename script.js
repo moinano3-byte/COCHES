@@ -1445,6 +1445,40 @@ function posicionarAccionesMovil() {
   botonesMovil.style.top  = `${top}px`;
   botonesMovil.style.display = "flex";
 }
+function actualizarBotonesMovil() {
+  botonesMovil.innerHTML = ""; // limpiar antes
+
+  // Estado vacío → X
+  const btnVacio = document.createElement("button");
+  btnVacio.dataset.estado = "0";
+  btnVacio.textContent = "X";
+  btnVacio.className = "boton-movil-estado";
+  botonesMovil.appendChild(btnVacio);
+
+  // Estado M → persona.png
+  const btnPersona = document.createElement("button");
+  btnPersona.dataset.estado = "2";
+  btnPersona.className = "boton-movil-estado";
+  const imgPersona = document.createElement("img");
+  imgPersona.src = "persona.png";
+  imgPersona.alt = "Persona";
+  imgPersona.style.width = "30px";
+  imgPersona.style.height = "30px";
+  btnPersona.appendChild(imgPersona);
+  botonesMovil.appendChild(btnPersona);
+
+  // Estado M-C → volante.png
+  const btnVolante = document.createElement("button");
+  btnVolante.dataset.estado = "3";
+  btnVolante.className = "boton-movil-estado";
+  const imgVolante = document.createElement("img");
+  imgVolante.src = "volante.png";
+  imgVolante.alt = "Coche";
+  imgVolante.style.width = "30px";
+  imgVolante.style.height = "30px";
+  btnVolante.appendChild(imgVolante);
+  botonesMovil.appendChild(btnVolante);
+}
 
 
 }
