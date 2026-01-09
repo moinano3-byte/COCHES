@@ -1450,37 +1450,43 @@ function posicionarAccionesMovil() {
 function actualizarBotonesMovil() {
   botonesMovil.innerHTML = ""; // limpiar antes
 
+  // Vacío → X roja y grande
+  const btnVacio = document.createElement("button");
+  btnVacio.dataset.estado = "0";
+  btnVacio.className = "boton-movil-estado";
+  btnVacio.style.color = "red";
+  btnVacio.style.fontSize = "32px";
+  btnVacio.style.fontWeight = "bold";
+  btnVacio.textContent = "X";
+  botonesMovil.appendChild(btnVacio);
 
-
-  // Estado M → persona.png
+  // Persona
   const btnPersona = document.createElement("button");
   btnPersona.dataset.estado = "2";
   btnPersona.className = "boton-movil-estado";
+  btnPersona.style.padding = "0"; // quitar recuadro
   const imgPersona = document.createElement("img");
   imgPersona.src = "persona.png";
   imgPersona.alt = "Persona";
-  imgPersona.style.width = "30px";
-  imgPersona.style.height = "30px";
+  imgPersona.style.width = "40px";
+  imgPersona.style.height = "40px";
+  imgPersona.style.display = "block"; // evita que se vea inline
   btnPersona.appendChild(imgPersona);
   botonesMovil.appendChild(btnPersona);
 
-  // Estado M-C → volante.png
+  // Volante
   const btnVolante = document.createElement("button");
   btnVolante.dataset.estado = "3";
   btnVolante.className = "boton-movil-estado";
+  btnVolante.style.padding = "0";
   const imgVolante = document.createElement("img");
   imgVolante.src = "volante.png";
   imgVolante.alt = "Coche";
-  imgVolante.style.width = "30px";
-  imgVolante.style.height = "30px";
+  imgVolante.style.width = "40px";
+  imgVolante.style.height = "40px";
+  imgVolante.style.display = "block";
   btnVolante.appendChild(imgVolante);
   botonesMovil.appendChild(btnVolante);
-    // Estado vacío → X
-  const btnVacio = document.createElement("button");
-  btnVacio.dataset.estado = "0";
-  btnVacio.textContent = "X";
-  btnVacio.className = "boton-movil-estado";
-  botonesMovil.appendChild(btnVacio);
 }
 
 
