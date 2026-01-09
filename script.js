@@ -151,6 +151,22 @@ function generarCuadrante() {
    ========================================================= */
 
 const tabla = document.getElementById("cuadrante");
+/* ===============================
+   BLOQUEO GESTOS NATIVOS MÓVIL
+   (SIN romper el zoom)
+   =============================== */
+
+tabla.style.touchAction = "pinch-zoom";   // 🔥 permite zoom con 2 dedos
+
+["touchstart", "touchmove"].forEach(evento => {
+  tabla.addEventListener(evento, e => {
+    if (e.touches.length === 1) {
+      e.preventDefault();   // 🔥 1 dedo → no scroll, no refresh
+    }
+    // 2 dedos → NO se bloquea → zoom permitido
+  }, { passive: false });
+});
+
 const tbody = tabla.querySelector("tbody");
 const botonesMovil = document.getElementById("botones-movil");
 // Ocultar botones antes de generar cualquier cosa
@@ -1500,11 +1516,5 @@ document.addEventListener("touchmove", function (e) {
   // Un solo dedo → bloquear scroll
   e.preventDefault();
 }, { passive: false });
-
-document.addEventListener("gesturestart", function (e) {
-  e.preventDefault();   // Safari: evitar zoom raro
-});
-
-
 
 }
