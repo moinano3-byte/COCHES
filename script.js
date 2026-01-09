@@ -167,6 +167,12 @@ document.addEventListener("click", (e) => {
 botonesMovil.addEventListener("click", (e) => {
   e.stopPropagation();
 });
+// 🔹 Ocultar botones-móvil si se toca cualquier otro sitio (móvil)
+document.addEventListener("touchstart", (e) => {
+  if (!botonesMovil.contains(e.target)) {
+    botonesMovil.style.display = "none";
+  }
+}, { passive: true });
 
 const estados = ["", "-", "M", "M-C"];
 // índices:        0   1    2     3
