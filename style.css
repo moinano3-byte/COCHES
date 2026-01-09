@@ -21,7 +21,7 @@ body.modo-menu {
 #menu-config {
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: center; /* Centrado horizontal de todo el bloque */
   gap: 20px;
   padding: 35px 45px;
   background: #ffffff;
@@ -33,7 +33,7 @@ body.modo-menu {
   max-width: 520px;
   text-align: center;
   animation: aparecer 0.4s ease-out;
-  margin: auto;
+  margin: auto; /* centrado absoluto */
 }
 
 #menu-config::before {
@@ -69,9 +69,9 @@ body.modo-menu {
 }
 
 .btn-menu:hover {
-  background: #f0f0f0;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  transform: none;
+  background: #f0f0f0; /* resaltar */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); /* sombra sutil */
+  transform: none; /* eliminar el movimiento que borra */
 }
 
 /* ===== SUBMENÚS ===== */
@@ -118,8 +118,8 @@ body.modo-menu {
   transition: transform 0.2s ease, box-shadow 0.2s ease;
   letter-spacing: 1px;
   width: 100%;
-  max-width: 360px;
-  align-self: center;
+  max-width: 360px; /* Ancho máximo para mantener estética */
+  align-self: center; /* Centrado dentro del contenedor */
 }
 
 #btn-generar:hover {
@@ -127,21 +127,11 @@ body.modo-menu {
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
 }
 
-/* ===== CONTENEDOR TABLA SCROLLABLE ===== */
-#contenedor-cuadrante {
-  width: 100%;
-  height: 80vh;
-  overflow: auto;
-  border: 1px solid #aaa;
-  position: relative;
-}
-
 /* ===== TABLA ===== */
-#cuadrante {
+table {
   border-collapse: collapse;
+  width: auto;
   table-layout: auto;
-  transform-origin: top left;
-  transition: transform 0.2s ease;
 }
 
 th, td {
@@ -157,6 +147,7 @@ th, td {
 td {
   width: 40px;
 }
+
 
 /* ===== ENCABEZADOS ===== */
 thead th {
@@ -234,13 +225,19 @@ td.seleccionada {
 
 /* ===== ANIMACIONES ===== */
 @keyframes aparecer {
-  from { opacity: 0; transform: scale(0.9); }
-  to { opacity: 1; transform: scale(1.15); }
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1.15);
+  }
 }
 
 /* ===== PANTALLA DE ZONAS ===== */
 #pantalla-zonas {
-  display: none;
+  display: none; /* se mostrará desde JS */
   flex-direction: column;
   align-items: center;
   gap: 15px;
@@ -250,11 +247,12 @@ td.seleccionada {
   box-shadow: 0 15px 40px rgba(0,0,0,0.15);
   min-width: 420px;
   max-width: 520px;
-  margin: auto;
+  margin: auto; /* centrado horizontal */
   text-align: center;
 }
 
-.pantalla-zonas input[type="text"] {
+.pantalla-zonas input[type="text"],
+#pantalla-zonas input[type="text"] {
   width: 100%;
   padding: 6px 10px;
   border-radius: 8px;
@@ -262,39 +260,57 @@ td.seleccionada {
   font-size: 16px;
 }
 
-.pantalla-zonas label {
+.pantalla-zonas label,
+#pantalla-zonas label {
   display: flex;
   justify-content: space-between;
   align-items: center;
   gap: 10px;
   font-size: 18px;
 }
-
-/* ICONOS */
-.icono-persona, .icono-volante {
+/* 👤 PERSONA (SVG) */
+.icono-persona {
   position: absolute;
   inset: 0;
   margin: auto;
+
+  height: 3em;     /* 🔥 AQUÍ controlas el tamaño */
   width: auto;
+
   pointer-events: none;
 }
 
-.icono-persona { height: 3em; }
-.icono-volante { height: 2.5em; }
+
+
+
+/* 🖼️ VOLANTE */
+.icono-volante {
+  position: absolute;
+
+  inset: 0;             /* 🔥 ocupa exactamente la celda */
+  margin: auto;
+
+  height: 2.5em;        /* puede sobresalir */
+  width: auto;
+
+  pointer-events: none;
+}
 
 .viajero {
   height: 30px;
   min-height: 30px;
   max-height: 30px;
+
   position: relative;
   text-align: center;
   vertical-align: middle;
-  overflow: visible;
+
+  overflow: visible;   /* 🔥 CLAVE FINAL */
 }
 
 /* BOTONES MÓVIL */
 #botones-movil {
-  display: none;
+  display: none; /* ocultos por defecto */
   position: absolute;
   gap: 8px;
   background: rgba(255, 255, 255, 0.95);
@@ -318,35 +334,39 @@ td.seleccionada {
   justify-content: center;
 }
 
+
+
+
 #botones-movil button:hover {
   background: #f0f0f0;
   transform: scale(1.1);
 }
 
-.overlay-volante, .overlay-persona {
+
+/* Imagen dentro del botón COCHE */
+.overlay-volante {
+  width: 2em;
+  height: 2em;
+  object-fit: contain;
+  display: block;
+  margin: 0 auto; /* centra horizontalmente */
+}
+
+/* Imagen dentro del botón PERSONA */
+.overlay-persona {
   width: 2em;
   height: 2em;
   object-fit: contain;
   display: block;
   margin: 0 auto;
 }
-
-/* DESACTIVAR SELECCIÓN NATIVA */
-#cuadrante,
+/* ❌ Evitar selección de texto / iconos al arrastrar */
+#cuadrante, 
 #cuadrante * {
-  user-select: none !important;
-  -webkit-user-select: none !important;
-  -webkit-touch-callout: none !important;
-  -webkit-tap-highlight-color: transparent !important;
-  -ms-user-select: none !important;
+  user-select: none;
+  -webkit-user-select: none;
+  -ms-user-select: none;
 }
 
-/* EVITAR RESALTADO AZUL */
-#cuadrante svg,
-#cuadrante img,
-#cuadrante button {
-  pointer-events: none;
-}
 
-#cuadrante *::selection { background: transparent; }
-#cuadrante *::-moz-selection { background: transparent; }
+
