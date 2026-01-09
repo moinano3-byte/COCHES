@@ -361,12 +361,29 @@ td.seleccionada {
   margin: 0 auto;
 }
 /* ❌ Evitar selección de texto / iconos al arrastrar */
-#cuadrante, 
+/* 🔥 DESACTIVAR COMPLETAMENTE LA SELECCIÓN NATIVA */
+#cuadrante,
 #cuadrante * {
-  user-select: none;
-  -webkit-user-select: none;
-  -ms-user-select: none;
+  user-select: none !important;
+  -webkit-user-select: none !important;
+  -webkit-touch-callout: none !important;
+  -webkit-tap-highlight-color: transparent !important;
+  -ms-user-select: none !important;
 }
 
+/* 🔥 Evitar resaltado azul de letras, iconos y SVG */
+#cuadrante svg,
+#cuadrante img,
+#cuadrante button {
+  pointer-events: none;
+}
+
+/* 🔥 Quitar el highlight azul del navegador */
+#cuadrante *::selection {
+  background: transparent;
+}
+#cuadrante *::-moz-selection {
+  background: transparent;
+}
 
 
