@@ -1374,18 +1374,20 @@ tbody.addEventListener("touchmove", e => {
   const touch = e.touches[0];
   const elem = document.elementFromPoint(touch.clientX, touch.clientY);
   const td = elem?.closest("td");
-  if (!td || !esSeleccionable(td)) return;
 
-  arrastrando = true;
-  seleccionarRectangulo(td, true);
+  arrastrando = true; // 🔹 siempre marcar que estamos arrastrando
+
+  // Seleccionar solo si la celda es seleccionable
+  if (td && esSeleccionable(td)) {
+    seleccionarRectangulo(td, true);
+  }
 
   const MARGIN = 50; // px para activar scroll
   const speed = 5;
-
   const top = touch.clientY;
   const bottom = window.innerHeight - top;
 
-  // 🔹 Bloquear scroll nativo **solo mientras arrastramos**
+  // 🔹 Bloquear scroll nativo mientras arrastramos
   if (modoSeleccionMovil || arrastrando) {
     e.preventDefault();
   }
