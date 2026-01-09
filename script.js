@@ -153,6 +153,8 @@ function generarCuadrante() {
 const tabla = document.getElementById("cuadrante");
 const tbody = tabla.querySelector("tbody");
 const botonesMovil = document.getElementById("botones-movil");
+// Ocultar botones antes de generar cualquier cosa
+botonesMovil.style.display = "none";
 
 
 const estados = ["", "-", "M", "M-C"];
@@ -1414,33 +1416,35 @@ botonesMovil.addEventListener("click", e => {
   recalcular();
   limpiarSeleccion();
 
-  botonesMovil.style.display = "none";
 });
 function posicionarAccionesMovil() {
-  if (seleccion.size === 0) return;
+  if (seleccion.size === 0 || !tabla) {
+    botonesMovil.style.display = "none";
+    return;
+  }
 
+  // Rectángulo de toda la selección
   const rects = Array.from(seleccion).map(td => td.getBoundingClientRect());
   const minX = Math.min(...rects.map(r => r.left));
   const maxX = Math.max(...rects.map(r => r.right));
   const minY = Math.min(...rects.map(r => r.top));
+  const maxY = Math.max(...rects.map(r => r.bottom));
 
   const tablaRect = tabla.getBoundingClientRect();
 
-  // Posición inicial
   let left = minX - tablaRect.left;
-  let top = minY - tablaRect.top - botonesMovil.offsetHeight - 5;
+  let top  = minY - tablaRect.top - botonesMovil.offsetHeight - 5;
 
-  // Ajustes para que no se salga de la tabla
-  if (top < 0) top = minY - tablaRect.top + 5 + rects[0].height; // si queda arriba, colocar abajo de la selección
+  // Ajustar si se sale arriba o a la derecha
+  if (top < 0) top = maxY - tablaRect.top + 5;
   if (left + botonesMovil.offsetWidth > tablaRect.width) {
-    left = tablaRect.width - botonesMovil.offsetWidth - 5; // ajusta a derecha
+    left = tablaRect.width - botonesMovil.offsetWidth - 5;
   }
 
   botonesMovil.style.left = `${left}px`;
-  botonesMovil.style.top = `${top}px`;
+  botonesMovil.style.top  = `${top}px`;
   botonesMovil.style.display = "flex";
 }
 
 
-};
-
+}
