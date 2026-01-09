@@ -1369,7 +1369,6 @@ tbody.addEventListener("touchstart", e => {
 }, { passive: true });
 
 tbody.addEventListener("touchmove", e => {
-  // 🔹 Si hay más de un dedo, no hacemos nada → pinch zoom sigue activo
   if (e.touches.length !== 1 || !celdaInicio) return;
 
   const touch = e.touches[0];
@@ -1386,8 +1385,10 @@ tbody.addEventListener("touchmove", e => {
   const top = touch.clientY;
   const bottom = window.innerHeight - top;
 
-  // 🔹 Bloquear scroll nativo solo para 1 dedo
-  e.preventDefault();
+  // 🔹 Bloquear scroll nativo **solo mientras arrastramos**
+  if (modoSeleccionMovil || arrastrando) {
+    e.preventDefault();
+  }
 
   // Scroll personalizado solo al borde
   if (top <= MARGIN) window.scrollBy({ top: -speed, behavior: "smooth" });
