@@ -156,20 +156,23 @@ const botonesMovil = document.getElementById("botones-movil");
 // Ocultar botones antes de generar cualquier cosa
 botonesMovil.style.display = "none";
 
-// ===== CONTROL UNIFICADO BOTONES MOVIL/PC =====
-function ocultarBotonesSiNoEsClickEnBotones(e) {
+document.addEventListener("click", (e) => {
+  // Si el click NO es dentro del contenedor de botones, los ocultamos
   if (!botonesMovil.contains(e.target)) {
     botonesMovil.style.display = "none";
   }
-}
+});
 
-// Evita que click dentro de botones cierre layout
-botonesMovil.addEventListener("click", e => e.stopPropagation());
-
-// Listener global: click o touch fuera de botones
-document.addEventListener("click", ocultarBotonesSiNoEsClickEnBotones);
-document.addEventListener("touchstart", ocultarBotonesSiNoEsClickEnBotones, { passive: true });
-
+// Evitar que el click dentro de los botones cierre el layout
+botonesMovil.addEventListener("click", (e) => {
+  e.stopPropagation();
+});
+// 🔹 Ocultar botones-móvil si se toca cualquier otro sitio (móvil)
+document.addEventListener("touchstart", (e) => {
+  if (!botonesMovil.contains(e.target)) {
+    botonesMovil.style.display = "none";
+  }
+}, { passive: true });
 
 const estados = ["", "-", "M", "M-C"];
 // índices:        0   1    2     3
