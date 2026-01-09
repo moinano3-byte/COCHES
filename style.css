@@ -309,38 +309,30 @@ td.seleccionada {
 }
 /* ===== BOTONES MÓVIL RENOMBRADOS ===== */
 #botones-movil {
-  position: fixed;
-  bottom: 15px;
-  left: 50%;
-  transform: translateX(-50%);
-  background: rgba(255, 255, 255, 0.95);
+  position: absolute;          /* relativo a la tabla */
+  display: none;               /* se muestra solo al seleccionar */
+  gap: 8px;
+  background: rgba(255,255,255,0.95);
+  padding: 8px;
   border-radius: 12px;
-  padding: 12px 20px;
-  z-index: 1000;
-
-  display: flex;             /* flex para alinear botones */
-  flex-direction: row;       /* horizontal */
-  flex-wrap: wrap;           /* que se muevan a la siguiente línea si no caben */
-  justify-content: center;   /* centrados */
-  align-items: center;       /* centrados verticalmente */
-  gap: 12px;                 /* espacio entre botones */
-  box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+  box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+  z-index: 2000;               /* encima de todo */
+  flex-wrap: wrap;
 }
-
 
 #botones-movil button {
-  font-size: 1.6em;
-  min-width: 60px;       /* asegura ancho mínimo */
-  min-height: 60px;      /* asegura altura mínima */
-  padding: 12px 18px;
-  border-radius: 12px;
-  border: 1px solid #aaa;
-  background: #fff;
+  width: 60px;
+  height: 60px;
+  font-size: 1.2em;
+  border: none;
+  border-radius: 8px;
+  background-color: #f0f0f0;
   cursor: pointer;
   display: flex;
-  justify-content: center;
   align-items: center;
+  justify-content: center;
 }
+
 
 
 #botones-movil button:hover {
