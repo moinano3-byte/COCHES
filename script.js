@@ -1493,6 +1493,17 @@ function actualizarBotonesMovil() {
   botonesMovil.appendChild(btnX);
 }
 
+document.addEventListener("touchmove", function (e) {
+  // Si es pinch (2 o más dedos) → permitir
+  if (e.touches.length > 1) return;
+
+  // Un solo dedo → bloquear scroll
+  e.preventDefault();
+}, { passive: false });
+
+document.addEventListener("gesturestart", function (e) {
+  e.preventDefault();   // Safari: evitar zoom raro
+});
 
 
 
