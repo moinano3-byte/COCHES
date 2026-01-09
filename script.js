@@ -156,6 +156,17 @@ const botonesMovil = document.getElementById("botones-movil");
 // Ocultar botones antes de generar cualquier cosa
 botonesMovil.style.display = "none";
 
+document.addEventListener("click", (e) => {
+  // Si el click NO es dentro del contenedor de botones, los ocultamos
+  if (!botonesMovil.contains(e.target)) {
+    botonesMovil.style.display = "none";
+  }
+});
+
+// Evitar que el click dentro de los botones cierre el layout
+botonesMovil.addEventListener("click", (e) => {
+  e.stopPropagation();
+});
 
 const estados = ["", "-", "M", "M-C"];
 // índices:        0   1    2     3
