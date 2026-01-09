@@ -1380,7 +1380,7 @@ tbody.addEventListener("touchmove", e => {
 
 
 tbody.addEventListener("touchend", e => {
-  if (e.touches.length > 0) return; // ignorar multi-touch
+  if (e.touches.length > 0) return;
 
   clearTimeout(touchTimer);
 
@@ -1391,20 +1391,18 @@ tbody.addEventListener("touchend", e => {
     recalcular();
   }
 
-  // Mostrar botones solo si hay selección
-if (seleccion.size > 0) {
-  actualizarBotonesMovil();   // 🔹 asegura que se creen con tu X e imágenes
-  posicionarAccionesMovil();
-  botonesMovil.style.display = "flex";
-}
-
-
-
+  // 🔹 Mostrar botones solo si hay selección
+  if (seleccion.size > 0) {
+    actualizarBotonesMovil();   // crea los botones con imágenes
+    posicionarAccionesMovil();  // los coloca sobre la selección
+    botonesMovil.style.display = "flex";
+  }
 
   celdaInicio = null;
   arrastrando = false;
   modoSeleccionMovil = false;
 });
+
 botonesMovil.addEventListener("click", e => {
   const btn = e.target.closest("button");
   if (!btn) return;
@@ -1417,8 +1415,9 @@ botonesMovil.addEventListener("click", e => {
 
   recalcular();
   limpiarSeleccion();
-
+  botonesMovil.style.display = "none";
 });
+
 function posicionarAccionesMovil() {
   if (seleccion.size === 0 || !tabla) {
     botonesMovil.style.display = "none";
@@ -1448,36 +1447,35 @@ function posicionarAccionesMovil() {
   botonesMovil.style.display = "flex";
 }
 function actualizarBotonesMovil() {
-  botonesMovil.innerHTML = ""; // limpiar antes
+  const botonesMovil = document.getElementById("botones-movil");
+  botonesMovil.innerHTML = ""; // limpiar primero
+  botonesMovil.style.display = "flex";
 
-  // Vacío → X roja y grande
-  const btnVacio = document.createElement("button");
-  btnVacio.dataset.estado = "0";
-  btnVacio.className = "boton-movil-estado";
-  btnVacio.style.color = "red";
-  btnVacio.style.fontSize = "32px";
-  btnVacio.style.fontWeight = "bold";
-  btnVacio.textContent = "X";
-  botonesMovil.appendChild(btnVacio);
+  // ❌ X roja
+  const btnX = document.createElement("button");
+  btnX.dataset.estado = "0";
+  btnX.style.color = "red";
+  btnX.style.fontSize = "32px";
+  btnX.style.fontWeight = "bold";
+  btnX.textContent = "X";
+  botonesMovil.appendChild(btnX);
 
-  // Persona
+  // 👤 Persona
   const btnPersona = document.createElement("button");
   btnPersona.dataset.estado = "2";
-  btnPersona.className = "boton-movil-estado";
-  btnPersona.style.padding = "0"; // quitar recuadro
+  btnPersona.style.padding = "0";
   const imgPersona = document.createElement("img");
   imgPersona.src = "persona.png";
   imgPersona.alt = "Persona";
   imgPersona.style.width = "40px";
   imgPersona.style.height = "40px";
-  imgPersona.style.display = "block"; // evita que se vea inline
+  imgPersona.style.display = "block";
   btnPersona.appendChild(imgPersona);
   botonesMovil.appendChild(btnPersona);
 
-  // Volante
+  // 🚗 Volante
   const btnVolante = document.createElement("button");
   btnVolante.dataset.estado = "3";
-  btnVolante.className = "boton-movil-estado";
   btnVolante.style.padding = "0";
   const imgVolante = document.createElement("img");
   imgVolante.src = "volante.png";
@@ -1488,6 +1486,8 @@ function actualizarBotonesMovil() {
   btnVolante.appendChild(imgVolante);
   botonesMovil.appendChild(btnVolante);
 }
+
+
 
 
 }
