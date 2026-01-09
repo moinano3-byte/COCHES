@@ -1419,18 +1419,25 @@ botonesMovil.addEventListener("click", e => {
 function posicionarAccionesMovil() {
   if (seleccion.size === 0) return;
 
-  // Obtener coordenadas del rectángulo que rodea toda la selección
   const rects = Array.from(seleccion).map(td => td.getBoundingClientRect());
   const minX = Math.min(...rects.map(r => r.left));
   const maxX = Math.max(...rects.map(r => r.right));
   const minY = Math.min(...rects.map(r => r.top));
-  const maxY = Math.max(...rects.map(r => r.bottom));
 
   const tablaRect = tabla.getBoundingClientRect();
 
-  // Posicionar botones sobre la tabla y encima de la selección
-  botonesMovil.style.left = `${minX - tablaRect.left}px`;
-  botonesMovil.style.top = `${minY - tablaRect.top - botonesMovil.offsetHeight - 5}px`; // 5px de margen
+  // Posición inicial
+  let left = minX - tablaRect.left;
+  let top = minY - tablaRect.top - botonesMovil.offsetHeight - 5;
+
+  // Ajustes para que no se salga de la tabla
+  if (top < 0) top = minY - tablaRect.top + 5 + rects[0].height; // si queda arriba, colocar abajo de la selección
+  if (left + botonesMovil.offsetWidth > tablaRect.width) {
+    left = tablaRect.width - botonesMovil.offsetWidth - 5; // ajusta a derecha
+  }
+
+  botonesMovil.style.left = `${left}px`;
+  botonesMovil.style.top = `${top}px`;
   botonesMovil.style.display = "flex";
 }
 
