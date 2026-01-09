@@ -149,9 +149,10 @@ function generarCuadrante() {
 /* =========================================================
    ===== CONFIGURACIÓN GENERAL
    ========================================================= */
+
 const tabla = document.getElementById("cuadrante");
 const tbody = tabla.querySelector("tbody");
-
+const botonesMovil = document.getElementById("botones-movil");
 
 
 const estados = ["", "-", "M", "M-C"];
@@ -1415,6 +1416,23 @@ botonesMovil.addEventListener("click", e => {
 
   botonesMovil.style.display = "none";
 });
+function posicionarAccionesMovil() {
+  if (seleccion.size === 0) return;
+
+  // Obtener coordenadas del rectángulo que rodea toda la selección
+  const rects = Array.from(seleccion).map(td => td.getBoundingClientRect());
+  const minX = Math.min(...rects.map(r => r.left));
+  const maxX = Math.max(...rects.map(r => r.right));
+  const minY = Math.min(...rects.map(r => r.top));
+  const maxY = Math.max(...rects.map(r => r.bottom));
+
+  const tablaRect = tabla.getBoundingClientRect();
+
+  // Posicionar botones sobre la tabla y encima de la selección
+  botonesMovil.style.left = `${minX - tablaRect.left}px`;
+  botonesMovil.style.top = `${minY - tablaRect.top - botonesMovil.offsetHeight - 5}px`; // 5px de margen
+  botonesMovil.style.display = "flex";
+}
 
 
 };
