@@ -1338,6 +1338,11 @@ function seleccionarRectangulo(tdFin) {
       if (esSeleccionable(td)) {
         td.classList.add("seleccionada");
         seleccion.add(td);
+        // 👉 Mostrar botones móviles cuando hay selección
+if (seleccion.size > 0) {
+  botonesMovil.style.display = "flex";
+}
+
       }
     }
   }
@@ -1402,6 +1407,8 @@ document.addEventListener("click", e => {
   if (arrastreReciente) return;
 
   limpiarSeleccion();
+  botonesMovil.style.display = "none";
+
 });
 
 
@@ -1536,15 +1543,7 @@ tbody.addEventListener("touchend", e => {
   celdaInicio = null;
   arrastrando = false;
   modoSeleccionMovil = false;
-   // Mostrar botones solo si hay selección
-  if (seleccion.size > 0) {
-    const ultima = Array.from(seleccion).pop(); // última celda seleccionada
-    mostrarBotonesMovil(ultima);
-  } else {
-    botonesMovil.style.display = "none"; // ocultar si no hay selección
-  }
-}, { passive: true });
-};
+});
 
 /* ===================== TOUCH CANCEL ===================== */
 tbody.addEventListener("touchcancel", e => {
@@ -1638,3 +1637,4 @@ function actualizarBotonesMovil() {
 
 
 
+}
