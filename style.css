@@ -566,7 +566,7 @@ td.seleccionada {
   display: none; /* por defecto ocultos */
 }
 
-/* BOTÓN GUARDAR - CENTRO ABAJO */
+/* ===== BOTÓN GUARDAR - CENTRO ABAJO ===== */
 .btn-fijo.guardar {
   font-family: "Comic Sans MS", "Comic Sans", cursive;
   bottom: 40px;
@@ -576,16 +576,24 @@ td.seleccionada {
   font-size: 44px;
   background: linear-gradient(135deg, #70AD47, #9BBB59);
   color: rgb(0, 0, 0);
+
+  position: fixed !important;  /* 👈 Siempre fijo en pantalla */
+  z-index: 9999 !important;    /* 👈 Por encima de todo */
+  pointer-events: auto;        /* 👈 Para que siempre se pueda pulsar */
 }
 
-/* BOTÓN VOLVER - ESQUINA SUPERIOR DERECHA */
+/* ===== BOTÓN VOLVER - ESQUINA SUPERIOR DERECHA ===== */
 .btn-fijo.volver {
   top: 40px;
-  right: 20px;  /* Cambiado de left a right */
+  right: 20px;  
   padding: 14px 18px;
   font-size: 48px;
-  background: linear-gradient(135deg, #70AD47, #9BBB59);;
+  background: linear-gradient(135deg, #70AD47, #9BBB59);
   color: black;
+
+  position: fixed !important;  
+  z-index: 9999 !important;    
+  pointer-events: auto;
 }
 
 /* HOVER EFECTO */
@@ -607,9 +615,12 @@ td.seleccionada {
 #pantalla-cuadrante.pantalla-activa {
   display: block;
 }
+
 /* botones fijos siempre visibles mientras pantalla cuadrante está activa */
 .pantalla-activa #btn-guardar-cuadrante,
 .pantalla-activa #btn-salir-inicio {
   display: block !important;
+  position: fixed !important;  /* 👈 reforzado */
+  z-index: 9999 !important;
+  pointer-events: auto;
 }
-
