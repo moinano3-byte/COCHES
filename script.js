@@ -1439,19 +1439,22 @@ window.addEventListener("keydown", e => {
 });
 
 /* =========================================================
-   SELECCIÓN TÁCTIL (MÓVIL) – ARRASTRE RECTANGULAR
+   SELECCIÓN TÁCTIL (MÓVIL) CON SCROLL NATURAL Y DELAY
 ========================================================= */
 
-let modoSeleccionMovil = false; // true mientras arrastras
+let modoSeleccionMovil = false;
 let celdaInicio = null;
+let seleccionDelay = null;
+const delaySeleccion = 200; // ms antes de empezar a seleccionar
+const scrollVel = 10;       // velocidad scroll automático
 
-// Limpiar selección visual
+// Limpia selección visual
 function limpiarSeleccion() {
   seleccion.forEach(td => td.classList.remove("seleccionada"));
   seleccion.clear();
 }
 
-// Detecta si una celda es seleccionable
+// Celda seleccionable
 function esSeleccionable(td) {
   return td &&
     td.tagName === "TD" &&
@@ -1459,7 +1462,7 @@ function esSeleccionable(td) {
     !td.classList.contains("celda-no-interactiva");
 }
 
-// Seleccionar rectángulo desde celdaInicio hasta tdFin
+// Selección rectangular
 function seleccionarRectangulo(tdFin) {
   if (!celdaInicio) return;
 
@@ -1489,10 +1492,21 @@ function seleccionarRectangulo(tdFin) {
   }
 }
 
+// Auto-scroll si arrastras cerca del borde
+function autoScroll(touch) {
+  const edge = 50; // px del borde para activar scroll
+  const rect = tbody.getBoundingClientRect();
+
+  if (touch.clientY < rect.top + edge) {
+    tbody.scrollBy({ top: -scrollVel, behavior: "smooth" });
+  } else if (touch.clientY > rect.bottom - edge) {
+    tbody.scrollBy({ top: scrollVel, behavior: "smooth" });
+  }
+}
+
 /* ===================== TOUCH START ===================== */
 tbody.addEventListener("touchstart", e => {
   if (e.touches.length !== 1) {
-    // Múltiples dedos → cancelar selección
     limpiarSeleccion();
     celdaInicio = null;
     arrastrando = false;
@@ -1507,32 +1521,38 @@ tbody.addEventListener("touchstart", e => {
 
   celdaInicio = td;
   arrastrando = false;
-  modoSeleccionMovil = true;
+  modoSeleccionMovil = false;
 
-  limpiarSeleccion();
-  td.classList.add("seleccionada");
-  seleccion.add(td);
+  // Delay para permitir scroll nativo antes de empezar selección
+  seleccionDelay = setTimeout(() => {
+    modoSeleccionMovil = true;
+    td.classList.add("seleccionada");
+    seleccion.add(td);
+  }, delaySeleccion);
 }, { passive: false });
 
 /* ===================== TOUCH MOVE ===================== */
 tbody.addEventListener("touchmove", e => {
-  if (!celdaInicio) return;
-
   const touch = e.touches[0];
-  const td = document.elementFromPoint(touch.clientX, touch.clientY)?.closest("td");
 
+  // Auto-scroll mientras arrastras
+  autoScroll(touch);
+
+  const td = document.elementFromPoint(touch.clientX, touch.clientY)?.closest("td");
   if (!td || !esSeleccionable(td)) return;
+
+  if (!modoSeleccionMovil) return; // aún en delay → permite scroll nativo
 
   arrastrando = true;
   seleccionarRectangulo(td);
 
-  // 🔹 BLOQUEAR scroll nativo mientras arrastras
+  // Bloquea scroll nativo mientras selecciona
   e.preventDefault();
 }, { passive: false });
 
 /* ===================== TOUCH END ===================== */
 tbody.addEventListener("touchend", e => {
-  // Reset selección táctil
+  clearTimeout(seleccionDelay);
   celdaInicio = null;
   arrastrando = false;
   modoSeleccionMovil = false;
@@ -1540,6 +1560,7 @@ tbody.addEventListener("touchend", e => {
 
 /* ===================== TOUCH CANCEL ===================== */
 tbody.addEventListener("touchcancel", e => {
+  clearTimeout(seleccionDelay);
   celdaInicio = null;
   arrastrando = false;
   modoSeleccionMovil = false;
