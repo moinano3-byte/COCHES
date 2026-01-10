@@ -1540,8 +1540,8 @@ tbody.addEventListener("touchmove", e => {
     seleccionarRectangulo(td);
   } else {
     // Si es celda no interactiva, resetear selección
-    arrastrando = false;
-    modoSeleccionMovil = false;
+    arrastrando = true;
+    modoSeleccionMovil = true;
     celdaInicio = null;
   }
 
