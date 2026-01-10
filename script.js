@@ -10,18 +10,8 @@ function ocultarBotonesCuadrante() {
   btnGuardar.style.display = "none";
   btnSalir.style.display   = "none";
 }
-window.addEventListener("DOMContentLoaded", () => {
-    const btnNuevoGrupo = document.getElementById("btn-nuevo-grupo");
-  const inicioApp = document.getElementById("inicio-app");
-  const menuConfig = document.getElementById("menu-config");
+document.addEventListener("DOMContentLoaded", () => {
 
-  if(btnNuevoGrupo){
-    btnNuevoGrupo.addEventListener("click", () => {
-      inicioApp.style.display = "none";
-      menuConfig.style.display = "flex";
-    });
-  }
-});
   // ===== BOTONES DEL CUADRANTE =====
   const btnGuardar = document.getElementById("btn-guardar-cuadrante");
   const btnSalir   = document.getElementById("btn-salir-inicio");
@@ -33,30 +23,49 @@ window.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  if (btnSalir) {
-    btnSalir.addEventListener("click", () => {
-      const pantallaCuadrante = document.getElementById("pantalla-cuadrante");
-      const inicioApp         = document.getElementById("inicio-app");
+btnSalir.addEventListener("click", () => {
+ 
+  document.getElementById("pantalla-cuadrante").classList.remove("pantalla-activa");
+  document.getElementById("menu-config").style.display = "none";
+  document.getElementById("inicio-app").style.display = "flex";
+  document.body.classList.add("modo-menu");
+  ocultarBotonesCuadrante();
+});
 
-      if (pantallaCuadrante) pantallaCuadrante.style.display = "none";
-      if (inicioApp)         inicioApp.style.display = "flex";
+document.getElementById("btn-generar").addEventListener("click", () => {
+  reiniciarCuadrante(); // 👈 limpia antes de generar
+ 
+  generarCuadrante();
+  mostrarBotonesCuadrante();
+});
+function reiniciarCuadrante() {
+  const tabla = document.getElementById("cuadrante");
+  if (!tabla) return;
 
-      // Llama a tu función que oculta botones del cuadrante
-      if (typeof ocultarBotonesCuadrante === "function") {
-        ocultarBotonesCuadrante();
-      }
-    });
-  }
+  // 🔥 Eliminar TODAS las filas excepto el tbody vacío
+  tabla.innerHTML = "<tbody></tbody>";
+}
+
+
+
+
+});
+
+
+
 
 
 
 // ===== BOTÓN GENERAR CUADRANTE =====
 document.getElementById("btn-generar").addEventListener("click", () => {
   document.getElementById("menu-config").style.display = "none";
+  document.getElementById("pantalla-cuadrante").classList.add("pantalla-activa");
   document.body.classList.remove("modo-menu");
+
   generarCuadrante();
-  mostrarBotonesCuadrante(); // 👈 AÑADIDO
+  mostrarBotonesCuadrante();
 });
+
 
 
 // ===== PANTALLA DE ZONAS =====
