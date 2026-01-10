@@ -5,6 +5,7 @@ body {
   font-weight: 900;
   padding: 20px;
   margin: 0;
+  padding-bottom: 70px;
 }
 
 /* ===== MODO MENÚ (pantalla inicial) ===== */
@@ -19,9 +20,9 @@ body.modo-menu {
 
 /* ===== MENÚ CONFIGURACIÓN ===== */
 #menu-config {
-  display: flex;
+  display: none; /* 🔴 OCULTO POR DEFECTO */
   flex-direction: column;
-  align-items: center; /* Centrado horizontal de todo el bloque */
+  align-items: center;
   gap: 20px;
   padding: 35px 45px;
   background: #ffffff;
@@ -33,8 +34,12 @@ body.modo-menu {
   max-width: 520px;
   text-align: center;
   animation: aparecer 0.4s ease-out;
-  margin: auto; /* centrado absoluto */
+  margin: auto;
 }
+#menu-config.pantalla-activa {
+  display: flex;
+}
+
 
 #menu-config::before {
   content: "CONFIGURAR CUADRANTE";
@@ -113,7 +118,7 @@ body.modo-menu {
   border: none;
   cursor: pointer;
   background: linear-gradient(135deg, #70AD47, #9BBB59);
-  color: white;
+  color: rgb(0, 0, 0);
   box-shadow: 0 6px 15px rgba(0, 0, 0, 0.25);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
   letter-spacing: 1px;
@@ -367,6 +372,308 @@ td.seleccionada {
   -webkit-user-select: none;
   -ms-user-select: none;
 }
+/* ===== SISTEMA DE PANTALLAS ===== */
+.pantalla {
+  display: none;
+}
+
+.pantalla-activa {
+  display: flex;
+}
+/* ===== PANTALLA DE INICIO ===== */
+#inicio-app {
+  flex-direction: column;
+  align-items: center;
+  gap: 35px; /* Mayor espacio entre elementos */
+  padding: 50px 60px; /* Más padding para un cuadro más grande */
+  background: #ffffff;
+  border-radius: 20px;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.2); /* Sombra más intensa */
+  min-width: 500px;
+  max-width: 600px;
+  min-height: 400px; /* Mayor altura */
+  margin: auto;
+  text-align: center;
+  animation: aparecer 0.4s ease-out;
+}
+
+/* Estilo para los botones en la pantalla de inicio */
+#inicio-app .btn-menu {
+  padding: 20px 30px; /* Botones más grandes */
+  font-size: 24px; /* Texto más grande */
+  font-weight: 900;
+  border-radius: 16px;
+  border: none;
+  background: linear-gradient(135deg, #9BBB59, #70AD47);
+  color: rgb(0, 0, 0);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2); /* Sombra llamativa */
+  width: 80%; /* Ajustar ancho para que se vean bien */
+}
+
+#inicio-app .btn-menu:hover {
+  transform: scale(1.05);
+  background: linear-gradient(135deg, #70AD47, #9BBB59);
+  box-shadow: 0 12px 25px rgba(0, 0, 0, 0.3);
+}
 
 
+#inicio-app h1 {
+  font-size: 32px;
+  font-weight: 900;
+  color: #9BBB59;
+}
+/* ===== PANTALLA FINES DE SEMANA Y FESTIVOS ===== */
+#pantalla-findes-festivos {
+  display: none; /* se mostrará desde JS */
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  padding: 35px 45px;
+  background: #ffffff;
+  border-radius: 18px;
+  border: none;
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+  font-size: 18px;
+  min-width: 420px;
+  max-width: 520px;
+  margin: auto; /* centrado horizontal */
+  text-align: center;
+  animation: aparecer 0.4s ease-out;
+}
+
+#pantalla-findes-festivos h2 {
+  font-size: 32px;
+  font-weight: 900;
+  color: #9BBB59;
+  margin-bottom: 25px;
+}
+
+/* Botones dentro de la pantalla fines de semana y festivos */
+#pantalla-findes-festivos .btn-menu {
+  padding: 14px 20px;
+  font-size: 20px;
+  font-weight: 900;
+  border-radius: 14px;
+  border: 2px solid #aaa;
+  background: linear-gradient(135deg, #eaeaea, #ffffff);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: left;
+  width: 100%;
+}
+
+#pantalla-findes-festivos .btn-menu:hover {
+  background: #f0f0f0;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+/* Submenús dentro de fines de semana y festivos */
+#pantalla-findes-festivos .submenu {
+  display: flex; /* mostrar los submenús internos si es necesario */
+  flex-direction: column;
+  padding: 18px;
+  border-radius: 14px;
+  background: #f7f9fc;
+  box-shadow: inset 0 0 0 2px #d0d0d0;
+}
+
+#pantalla-findes-festivos label {
+  font-size: 19px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 15px;
+}
+
+#pantalla-findes-festivos select {
+  font-size: 18px;
+  padding: 6px 10px;
+  border-radius: 8px;
+  border: 2px solid #aaa;
+}
+/* ===== PANTALLA UBICACIONES ===== */
+#pantalla-zonas {
+  display: none; /* se mostrará desde JS */
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  padding: 35px 45px;
+  background: #ffffff;
+  border-radius: 18px;
+  border: none;
+  box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+  font-size: 18px;
+  min-width: 420px;
+  max-width: 520px;
+  margin: auto; /* centrado horizontal */
+  text-align: center;
+  animation: aparecer 0.4s ease-out;
+}
+
+#pantalla-zonas h2 {
+  font-size: 32px;
+  font-weight: 900;
+  color: #9BBB59;
+  margin-bottom: 25px;
+}
+
+/* Labels y selects dentro de zonas */
+#pantalla-zonas label {
+  font-size: 19px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 15px;
+}
+
+#pantalla-zonas select,
+#pantalla-zonas input[type="text"] {
+  font-size: 18px;
+  padding: 6px 10px;
+  border-radius: 8px;
+  border: 2px solid #aaa;
+  width: 100%;
+}
+
+/* Botones de guardar/volver */
+#pantalla-zonas button {
+  padding: 14px 20px;
+  font-size: 20px;
+  font-weight: 900;
+  border-radius: 14px;
+  border: 2px solid #aaa;
+  background: linear-gradient(135deg, #eaeaea, #ffffff);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+#pantalla-zonas button:hover {
+  background: #f0f0f0;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+/* ===== BOTONES FIJOS EN CUADRANTE ===== */
+.btn-fijo {
+  position: fixed;
+  z-index: 3000; /* Siempre encima de todo */
+  border: none;
+  cursor: pointer;
+  font-weight: 900;
+  border-radius: 14px;
+  box-shadow: 0 6px 15px rgba(0,0,0,0.25);
+  transition: all 0.2s ease;
+  display: none; /* por defecto ocultos */
+}
+
+/* BOTÓN GUARDAR - CENTRO ABAJO */
+.btn-fijo.guardar {
+  font-family: "Comic Sans MS", "Comic Sans", cursive;
+  bottom: 40px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 18px 28px;
+  font-size: 44px;
+  background: linear-gradient(135deg, #70AD47, #9BBB59);
+  color: rgb(0, 0, 0);
+}
+
+/* BOTÓN VOLVER - ESQUINA SUPERIOR DERECHA */
+.btn-fijo.volver {
+  top: 40px;
+  right: 20px;  /* Cambiado de left a right */
+  padding: 14px 18px;
+  font-size: 48px;
+  background: linear-gradient(135deg, #70AD47, #9BBB59);;
+  color: black;
+}
+
+/* HOVER EFECTO */
+.btn-fijo:hover {
+  transform: translateX(-50%) scale(1.05);
+  box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+}
+.btn-fijo.volver:hover {
+  transform: scale(1.05);
+  transform-origin: center;
+}
+.btn-guardar-cuadrante,
+.btn-salir-cuadrante {
+  position: fixed;
+  bottom: 10px;
+  z-index: 10000;
+}
+
+.btn-guardar-cuadrante {
+  left: 10px;
+}
+
+.btn-salir-cuadrante {
+  right: 10px;
+}
+/* ===== FORZAR VISIBILIDAD BOTONES EN MÓVIL ===== */
+.btn-guardar-cuadrante,
+.btn-salir-cuadrante {
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+
+  position: fixed !important;
+  bottom: 10px !important;
+
+  z-index: 999999 !important;
+
+  background: red !important;
+  color: white !important;
+  padding: 12px 16px !important;
+  font-size: 18px !important;
+  border: 3px solid black !important;
+}
+.btn-guardar-cuadrante {
+  left: 10px !important;
+}
+.btn-salir-cuadrante {
+  right: 10px !important;
+}
+
+@media (max-width: 768px) {
+
+  /* 🔥 FORZAR ANCHO REAL EN MÓVIL */
+  body {
+    min-width: 0 !important;
+    overflow-x: hidden;
+  }
+
+  #menu-config,
+  #pantalla-zonas,
+  #inicio-app,
+  #pantalla-findes-festivos {
+    min-width: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    padding: 20px !important;
+    box-sizing: border-box;
+  }
+
+  /* 🔥 FORZAR BOTONES FIJOS DENTRO DEL VIEWPORT */
+  .btn-guardar-cuadrante,
+  .btn-salir-cuadrante {
+    display: block !important;
+    position: fixed !important;
+    z-index: 999999 !important;
+  }
+
+  .btn-guardar-cuadrante {
+    bottom: 12px !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+  }
+
+  .btn-salir-cuadrante {
+    top: 12px !important;
+    right: 12px !important;
+    left: auto !important;
+  }
+}
 
