@@ -1444,8 +1444,6 @@ window.addEventListener("keydown", e => {
 
 let modoSeleccionMovil = false; // true mientras arrastras
 let celdaInicio = null;
-const delaySeleccion = 400; // ms antes de empezar a seleccionar
-const scrollVel = 10;       // velocidad scroll automático
 
 // Limpiar selección visual
 function limpiarSeleccion() {
@@ -1490,17 +1488,7 @@ function seleccionarRectangulo(tdFin) {
     }
   }
 }
-// Auto-scroll si arrastras cerca del borde
-function autoScroll(touch) {
-  const edge = 50; // px del borde para activar scroll
-  const rect = tbody.getBoundingClientRect();
 
-  if (touch.clientY < rect.top + edge) {
-    tbody.scrollBy({ top: -scrollVel, behavior: "smooth" });
-  } else if (touch.clientY > rect.bottom - edge) {
-    tbody.scrollBy({ top: scrollVel, behavior: "smooth" });
-  }
-}
 /* ===================== TOUCH START ===================== */
 tbody.addEventListener("touchstart", e => {
   if (e.touches.length !== 1) {
