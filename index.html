@@ -2,21 +2,35 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Generador de Cuadrantes</title>
   <link rel="stylesheet" href="style.css">
 </head>
 
 <body class="modo-menu">
 
+  <!-- ===== PANTALLA INICIO ===== -->
+  <div id="inicio-app" class="pantalla pantalla-activa">
+    <h1>GESTIÓN DE GRUPOS</h1>
+
+    <button id="btn-nuevo-grupo" class="btn-menu">
+      NUEVO GRUPO
+    </button>
+
+    <button id="btn-cargar-grupo" class="btn-menu">
+      CARGAR GRUPO
+    </button>
+  </div>
+
   <!-- ===== MENÚ PRINCIPAL ===== -->
-  <div id="menu-config">
+  <div id="menu-config" class="pantalla">
 
     <!-- BOTÓN AÑO -->
     <div class="bloque-menu">
       <button type="button" class="btn-menu" id="btn-anio" style="text-align: center;">
         AÑO
       </button>
-      <div id="submenu-anio" class="submenu" style="display:none; flex-direction: column; gap:5px; margin-top:10px; width:100%;">
+      <div id="submenu-anio" class="submenu">
         <label>
           Selecciona año:
           <select id="cfg-anio"></select>
@@ -65,7 +79,7 @@
   </div>
 
   <!-- ===== PANTALLA FESTIVOS ===== -->
-  <div id="pantalla-findes-festivos" style="display:none; flex-direction: column; align-items: center; gap: 20px; padding: 35px 45px; background: #ffffff; border-radius: 18px; box-shadow: 0 15px 40px rgba(0,0,0,0.15); min-width: 420px; max-width: 520px; margin: auto; text-align: center;">
+  <div id="pantalla-findes-festivos" class="pantalla">
     <h2>Festivos</h2>
 
     <label>
@@ -84,10 +98,10 @@
       </select>
     </label>
 
-    <div id="festivos-fechas" style="display:none; flex-direction: column; gap:5px; margin-top:10px; width:100%;">
+    <div id="festivos-fechas" class="submenu">
       <p>Seleccione los Festivos anuales:</p>
       <div id="lista-fechas"></div>
-      <button type="button" id="agregar-fecha" class="btn-menu" style="width:50%; align-self:center;">
+      <button type="button" id="agregar-fecha" class="btn-menu">
         Añadir Fecha
       </button>
     </div>
@@ -99,7 +113,7 @@
   </div>
 
   <!-- ===== PANTALLA DE ZONAS ===== -->
-  <div id="pantalla-zonas">
+  <div id="pantalla-zonas" class="pantalla">
     <h2>Definir Zonas</h2>
 
     <label>
@@ -120,15 +134,25 @@
       <button id="volver-menu">Volver</button>
     </div>
   </div>
+<button id="btn-salir-inicio"
+        class="btn-fijo volver solo-cuadrante"
+        title="Volver al inicio">
+  ⤺
+</button>
+
+<button id="btn-guardar-cuadrante"
+        class="btn-fijo guardar solo-cuadrante"
+        title="Guardar cuadrante">
+  GUARDAR
+</button>
 
   <!-- ===== TABLA DEL CUADRANTE ===== -->
   <table id="cuadrante">
     <tbody></tbody>
   </table>
 
-<!-- ===== NUEVOS BOTONES MÓVIL ===== -->
-<div id="botones-movil" style="display:none; position:absolute; z-index:1000; flex-direction:row; gap:5px;"></div>
-
+  <!-- ===== BOTONES MÓVIL ===== -->
+  <div id="botones-movil"></div>
 
   <script src="script.js"></script>
 </body>
