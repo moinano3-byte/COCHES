@@ -1,3 +1,6 @@
+// ==== BOTONES DEL CUADRANTE ====
+const btnGuardar = document.getElementById("btn-guardar-cuadrante");
+const btnSalir   = document.getElementById("btn-salir-inicio");
 
 // Función para mostrar los botones
 function mostrarBotonesCuadrante() {
@@ -23,30 +26,46 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-btnSalir.addEventListener("click", () => {
- 
-  document.getElementById("pantalla-cuadrante").classList.remove("pantalla-activa");
-  document.getElementById("menu-config").style.display = "none";
-  document.getElementById("inicio-app").style.display = "flex";
-  document.body.classList.add("modo-menu");
-  ocultarBotonesCuadrante();
-});
+if (btnSalir) {
+  btnSalir.addEventListener("click", () => {
 
-document.getElementById("btn-generar").addEventListener("click", () => {
-  reiniciarCuadrante(); // 👈 limpia antes de generar
- 
-  generarCuadrante();
-  mostrarBotonesCuadrante();
-});
-function reiniciarCuadrante() {
-  const tabla = document.getElementById("cuadrante");
-  if (!tabla) return;
+    // 1️⃣ Cerrar pantalla cuadrante
+    const pantallaCuadrante = document.getElementById("pantalla-cuadrante");
+    if (pantallaCuadrante) {
+      pantallaCuadrante.classList.remove("pantalla-activa");
+      pantallaCuadrante.style.display = "none";
+    }
 
-  // 🔥 Eliminar TODAS las filas excepto el tbody vacío
-  tabla.innerHTML = "<tbody></tbody>";
+    // 2️⃣ BORRAR COMPLETAMENTE EL CUADRANTE
+    const tabla = document.getElementById("cuadrante");
+    if (tabla) {
+      // Limpiar filas del tbody
+      const tbody = tabla.querySelector("tbody");
+      if (tbody) tbody.innerHTML = "";
+
+      // Limpiar cualquier fila dinámica o residual
+      const filasExtras = tabla.querySelectorAll("tr");
+      filasExtras.forEach(fila => fila.remove());
+    }
+
+    // 3️⃣ Ocultar botones del cuadrante
+    ocultarBotonesCuadrante();
+
+    // 4️⃣ Volver al inicio limpio
+    const inicioApp = document.getElementById("inicio-app");
+    if (inicioApp) {
+      inicioApp.style.display = "flex";
+      inicioApp.classList.add("pantalla-activa");
+    }
+
+    // 5️⃣ Volver a modo menú
+    document.body.classList.add("modo-menu");
+
+    // 6️⃣ Limpiar variables de selección si las hay (prevención de residuos)
+    if (window.seleccionActiva) window.seleccionActiva = null;
+    if (window.celdasSeleccionadas) window.celdasSeleccionadas = [];
+  });
 }
-
-
 
 
 });
@@ -59,13 +78,13 @@ function reiniciarCuadrante() {
 // ===== BOTÓN GENERAR CUADRANTE =====
 document.getElementById("btn-generar").addEventListener("click", () => {
   document.getElementById("menu-config").style.display = "none";
-  document.getElementById("pantalla-cuadrante").classList.add("pantalla-activa");
   document.body.classList.remove("modo-menu");
-
   generarCuadrante();
-  mostrarBotonesCuadrante();
-});
+  mostrarBotonesCuadrante(); // 👈 AÑADIDO
+  document.getElementById("pantalla-cuadrante").style.display = "flex"; // mostrar pantalla
+document.getElementById("pantalla-cuadrante").classList.add("pantalla-activa");
 
+});
 
 
 // ===== PANTALLA DE ZONAS =====
@@ -1431,8 +1450,8 @@ let modoSeleccionMovil = false;
 let lastTouchY = null;   // ✅ DECLARADA CORRECTAMENTE
 let scrollActivo = false;
 const SCROLL_THRESHOLD = 12; // px
-
 tbody.addEventListener("touchstart", e => {
+
   if (e.touches.length !== 1) {
     limpiarSeleccion();
     celdaInicio = null;
@@ -1441,9 +1460,9 @@ tbody.addEventListener("touchstart", e => {
     return;
   }
 
-  const touch = e.touches[0];
-  lastTouchY = touch.clientY;
-  scrollActivo = false;
+  // ✅ Inicializar referencia del dedo
+  lastTouchY = e.touches[0].clientY;
+scrollActivo = false;
 
   const td = e.target.closest("td");
   if (!td || !esSeleccionable(td)) return;
@@ -1453,18 +1472,20 @@ tbody.addEventListener("touchstart", e => {
   modoSeleccionMovil = false;
   startScroll = window.scrollY;
 
-  // Pulsación larga para activar selección táctil
+  // ⏱️ Pulsación larga
   touchTimer = setTimeout(() => {
     modoSeleccionMovil = true;
-    startY = touch.clientY;
+    startY = e.touches[0].clientY;
     limpiarSeleccion();
     td.classList.add("seleccionada");
     seleccion.add(td);
-  }, 400);
+  }, 1200);
+
 }, { passive: true });
 
 
 tbody.addEventListener("touchmove", e => {
+
   if (e.touches.length !== 1) {
     limpiarSeleccion();
     celdaInicio = null;
@@ -1476,22 +1497,46 @@ tbody.addEventListener("touchmove", e => {
   if (!celdaInicio) return;
 
   const touch = e.touches[0];
-  const td = document.elementFromPoint(touch.clientX, touch.clientY)?.closest("td");
+  const elem = document.elementFromPoint(touch.clientX, touch.clientY);
+  const td = elem?.closest("td");
 
-  // Selección de celdas
+  // 🔹 Selección de celdas
   if (td && esSeleccionable(td)) {
     arrastrando = true;
-    seleccionarRectangulo(td);
-
-    // ✅ Bloquea scroll solo durante arrastre
-    if (modoSeleccionMovil && arrastrando) {
-      e.preventDefault();
-    }
+    seleccionarRectangulo(td, true);
   }
-}, { passive: false }); // necesario para e.preventDefault
+
+// 🔹 Scroll táctil con umbral (1:1) SOLO en modo selección
+if (modoSeleccionMovil) {
+  const currentY = touch.clientY;
+  const deltaTotal = Math.abs(currentY - startY);
+
+  // Activar scroll solo tras superar umbral
+  if (!scrollActivo && deltaTotal > SCROLL_THRESHOLD) {
+    scrollActivo = true;
+    lastTouchY = currentY; // reset limpio
+  }
+
+  if (scrollActivo && lastTouchY !== null) {
+    const deltaY = lastTouchY - currentY;
+    window.scrollBy(0, deltaY * 2.5);
+    window.scrollBy({
+    top: deltaY * 2.5,
+    behavior: "auto"
+});
+
+    lastTouchY = currentY;
+    e.preventDefault();
+  }
+}
+
+
+
+}, { passive: false });
 
 
 tbody.addEventListener("touchend", e => {
+
   clearTimeout(touchTimer);
 
   if (!modoSeleccionMovil) {
@@ -1511,9 +1556,9 @@ tbody.addEventListener("touchend", e => {
   celdaInicio = null;
   arrastrando = false;
   modoSeleccionMovil = false;
-  lastTouchY = null;
-});
+  lastTouchY = null;   // ✅ reset correcto
 
+});
 
 
 botonesMovil.addEventListener("click", e => {
