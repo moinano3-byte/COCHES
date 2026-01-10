@@ -1431,6 +1431,7 @@ let modoSeleccionMovil = false;
 let lastTouchY = null;   // ✅ DECLARADA CORRECTAMENTE
 let scrollActivo = false;
 const SCROLL_THRESHOLD = 12; // px
+
 tbody.addEventListener("touchstart", e => {
 
   if (e.touches.length !== 1) {
@@ -1460,7 +1461,7 @@ scrollActivo = false;
     limpiarSeleccion();
     td.classList.add("seleccionada");
     seleccion.add(td);
-  }, 1200);
+  }, 400);
 
 }, { passive: true });
 
