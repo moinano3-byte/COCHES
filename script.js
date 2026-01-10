@@ -1,9 +1,61 @@
+// ==== BOTONES DEL CUADRANTE ====
+const btnGuardar = document.getElementById("btn-guardar-cuadrante");
+const btnSalir   = document.getElementById("btn-salir-inicio");
+
+// Función para mostrar los botones
+function mostrarBotonesCuadrante() {
+  btnGuardar.style.display = "block";
+  btnSalir.style.display   = "block";
+}
+
+// Función para ocultar los botones
+function ocultarBotonesCuadrante() {
+  btnGuardar.style.display = "none";
+  btnSalir.style.display   = "none";
+}
+document.addEventListener("DOMContentLoaded", () => {
+
+  // ===== BOTONES DEL CUADRANTE =====
+  const btnGuardar = document.getElementById("btn-guardar-cuadrante");
+  const btnSalir   = document.getElementById("btn-salir-inicio");
+
+  if (btnGuardar) {
+    btnGuardar.addEventListener("click", () => {
+      alert("Cuadrante guardado ✔");
+      // Aquí puedes agregar luego la función real de guardado
+    });
+  }
+
+  if (btnSalir) {
+    btnSalir.addEventListener("click", () => {
+      const pantallaCuadrante = document.getElementById("pantalla-cuadrante");
+      const inicioApp         = document.getElementById("inicio-app");
+
+      if (pantallaCuadrante) pantallaCuadrante.style.display = "none";
+      if (inicioApp)         inicioApp.style.display = "flex";
+
+      // Llama a tu función que oculta botones del cuadrante
+      if (typeof ocultarBotonesCuadrante === "function") {
+        ocultarBotonesCuadrante();
+      }
+    });
+  }
+
+});
+
+
+
+
+
+
 // ===== BOTÓN GENERAR CUADRANTE =====
 document.getElementById("btn-generar").addEventListener("click", () => {
   document.getElementById("menu-config").style.display = "none";
   document.body.classList.remove("modo-menu");
   generarCuadrante();
+  mostrarBotonesCuadrante(); // 👈 AÑADIDO
 });
+
 
 // ===== PANTALLA DE ZONAS =====
 const btnZonas = document.getElementById("btn-zonas");
@@ -13,6 +65,15 @@ const nombresZonasDiv = document.getElementById("nombres-zonas");
 const guardarZonas = document.getElementById("guardar-zonas");
 const menuConfig = document.getElementById("menu-config");
 const btnVolverZonas = document.getElementById("volver-menu");
+
+// ===== BOTÓN NUEVO GRUPO – Mostrar menú config =====
+const inicioApp = document.getElementById("inicio-app");
+const btnNuevoGrupo = document.getElementById("btn-nuevo-grupo");
+
+btnNuevoGrupo.addEventListener("click", () => {
+  inicioApp.style.display = "none";  // Oculta pantalla inicial
+  menuConfig.style.display = "flex"; // Muestra menú config
+});
 
 // Abrir pantalla de Zonas
 btnZonas.addEventListener("click", () => {
@@ -142,6 +203,15 @@ btnAgregarFecha.addEventListener("click", () => {
   listaFechas.appendChild(input);
   contadorFechas++;
 });
+function mostrarBotonesCuadrante() {
+  document.getElementById("btn-guardar-cuadrante").style.display = "block";
+  document.getElementById("btn-salir-inicio").style.display = "block";
+}
+
+function ocultarBotonesCuadrante() {
+  document.getElementById("btn-guardar-cuadrante").style.display = "none";
+  document.getElementById("btn-salir-inicio").style.display = "none";
+}
 
 
 
@@ -1345,90 +1415,128 @@ window.addEventListener("keydown", e => {
 
 let startY = 0;
 let startScroll = 0;
-
+let touchTimer = null;
+let modoSeleccionMovil = false;
+let lastTouchY = null;   // ✅ DECLARADA CORRECTAMENTE
+let scrollActivo = false;
+const SCROLL_THRESHOLD = 12; // px
 tbody.addEventListener("touchstart", e => {
+
   if (e.touches.length !== 1) {
+    limpiarSeleccion();
+    celdaInicio = null;
+    arrastrando = false;
     modoSeleccionMovil = false;
-    return; // ignorar multitouch
+    return;
   }
+
+  // ✅ Inicializar referencia del dedo
+  lastTouchY = e.touches[0].clientY;
+scrollActivo = false;
 
   const td = e.target.closest("td");
   if (!td || !esSeleccionable(td)) return;
 
   celdaInicio = td;
   arrastrando = false;
-  startY = e.touches[0].clientY;
+  modoSeleccionMovil = false;
   startScroll = window.scrollY;
 
+  // ⏱️ Pulsación larga
   touchTimer = setTimeout(() => {
     modoSeleccionMovil = true;
+    startY = e.touches[0].clientY;
     limpiarSeleccion();
     td.classList.add("seleccionada");
     seleccion.add(td);
-  }, 400);
+  }, 1200);
+
 }, { passive: true });
 
+
 tbody.addEventListener("touchmove", e => {
-  if (e.touches.length !== 1 || !celdaInicio) return;
+
+  if (e.touches.length !== 1) {
+    limpiarSeleccion();
+    celdaInicio = null;
+    arrastrando = false;
+    modoSeleccionMovil = false;
+    return;
+  }
+
+  if (!celdaInicio) return;
 
   const touch = e.touches[0];
   const elem = document.elementFromPoint(touch.clientX, touch.clientY);
   const td = elem?.closest("td");
 
-  // 🔹 Solo seleccionar si la celda es seleccionable
+  // 🔹 Selección de celdas
   if (td && esSeleccionable(td)) {
     arrastrando = true;
     seleccionarRectangulo(td, true);
   }
 
-  const MARGIN = 50; // px para activar scroll
-  const speed = 5;
-  const top = touch.clientY;
-  const bottom = window.innerHeight - top;
+// 🔹 Scroll táctil con umbral (1:1) SOLO en modo selección
+if (modoSeleccionMovil) {
+  const currentY = touch.clientY;
+  const deltaTotal = Math.abs(currentY - startY);
 
-  // 🔹 Bloquear scroll nativo mientras arrastramos, incluso sobre celdas no seleccionables
-  if (celdaInicio && arrastrando) {
-    e.preventDefault();
+  // Activar scroll solo tras superar umbral
+  if (!scrollActivo && deltaTotal > SCROLL_THRESHOLD) {
+    scrollActivo = true;
+    lastTouchY = currentY; // reset limpio
   }
 
-  // 🔹 Scroll personalizado solo al borde de la pantalla
-  if (top <= MARGIN) window.scrollBy({ top: -speed, behavior: "smooth" });
-  else if (bottom <= MARGIN) window.scrollBy({ top: speed, behavior: "smooth" });
+  if (scrollActivo && lastTouchY !== null) {
+    const deltaY = lastTouchY - currentY;
+    window.scrollBy(0, deltaY * 2.5);
+    window.scrollBy({
+    top: deltaY * 2.5,
+    behavior: "auto"
+});
+
+    lastTouchY = currentY;
+    e.preventDefault();
+  }
+}
+
+
+
 }, { passive: false });
 
 
-
 tbody.addEventListener("touchend", e => {
-  if (e.touches.length > 0) return;
 
   clearTimeout(touchTimer);
 
-  // Click rápido → cambiar estado
-  if (celdaInicio && !modoSeleccionMovil && !arrastrando) {
-    celdaInicio.dataset.estado = (Number(celdaInicio.dataset.estado) + 1) % estados.length;
-    renderEstado(celdaInicio);
-    recalcular();
+  if (!modoSeleccionMovil) {
+    celdaInicio = null;
+    arrastrando = false;
+    lastTouchY = null;
+    scrollActivo = false;
+    return;
   }
 
-  // 🔹 Mostrar botones solo si hay selección
   if (seleccion.size > 0) {
-    actualizarBotonesMovil();   // crea los botones con imágenes
-    posicionarAccionesMovil();  // los coloca sobre la selección
+    actualizarBotonesMovil();
+    posicionarAccionesMovil();
     botonesMovil.style.display = "flex";
   }
 
   celdaInicio = null;
   arrastrando = false;
   modoSeleccionMovil = false;
+  lastTouchY = null;   // ✅ reset correcto
+
 });
+
 
 botonesMovil.addEventListener("click", e => {
   const btn = e.target.closest("button");
   if (!btn) return;
 
   const estado = btn.dataset.estado;
-  
-  // Aplicar estado a todas las celdas seleccionadas
+
   seleccion.forEach(td => {
     td.dataset.estado = estado;
     renderEstado(td);
@@ -1436,8 +1544,6 @@ botonesMovil.addEventListener("click", e => {
 
   recalcular();
   limpiarSeleccion();
-
-  // 🔹 OCULTAR EL LAYOUT DE BOTONES DESPUÉS DE USARLO
   botonesMovil.style.display = "none";
 });
 
@@ -1448,7 +1554,6 @@ function posicionarAccionesMovil() {
     return;
   }
 
-  // Rectángulo de toda la selección
   const rects = Array.from(seleccion).map(td => td.getBoundingClientRect());
   const minX = Math.min(...rects.map(r => r.left));
   const maxX = Math.max(...rects.map(r => r.right));
@@ -1460,7 +1565,6 @@ function posicionarAccionesMovil() {
   let left = minX - tablaRect.left;
   let top  = minY - tablaRect.top - botonesMovil.offsetHeight - 5;
 
-  // Ajustar si se sale arriba o a la derecha
   if (top < 0) top = maxY - tablaRect.top + 5;
   if (left + botonesMovil.offsetWidth > tablaRect.width) {
     left = tablaRect.width - botonesMovil.offsetWidth - 5;
@@ -1470,48 +1574,44 @@ function posicionarAccionesMovil() {
   botonesMovil.style.top  = `${top}px`;
   botonesMovil.style.display = "flex";
 }
+
+
 function actualizarBotonesMovil() {
   const botonesMovil = document.getElementById("botones-movil");
-  botonesMovil.innerHTML = ""; // limpiar primero
+  botonesMovil.innerHTML = "";
   botonesMovil.style.display = "flex";
-
 
   // 👤 Persona
   const btnPersona = document.createElement("button");
   btnPersona.dataset.estado = "2";
-  btnPersona.style.padding = "0";
   const imgPersona = document.createElement("img");
   imgPersona.src = "persona.png";
   imgPersona.alt = "Persona";
   imgPersona.style.width = "40px";
   imgPersona.style.height = "40px";
-  imgPersona.style.display = "block";
   btnPersona.appendChild(imgPersona);
   botonesMovil.appendChild(btnPersona);
 
   // 🚗 Volante
   const btnVolante = document.createElement("button");
   btnVolante.dataset.estado = "3";
-  btnVolante.style.padding = "0";
   const imgVolante = document.createElement("img");
   imgVolante.src = "volante.png";
   imgVolante.alt = "Coche";
   imgVolante.style.width = "40px";
   imgVolante.style.height = "40px";
-  imgVolante.style.display = "block";
   btnVolante.appendChild(imgVolante);
   botonesMovil.appendChild(btnVolante);
 
-    // ❌ X roja
+  // ❌ X roja
   const btnX = document.createElement("button");
   btnX.dataset.estado = "0";
+  btnX.textContent = "X";
   btnX.style.color = "red";
   btnX.style.fontSize = "32px";
   btnX.style.fontWeight = "bold";
-  btnX.textContent = "X";
   botonesMovil.appendChild(btnX);
 }
-
 
 
 
