@@ -606,5 +606,10 @@ td.seleccionada {
 #pantalla-cuadrante.pantalla-activa {
   display: block;
 }
+/* botones fijos siempre visibles mientras pantalla cuadrante está activa */
+.pantalla-activa #btn-guardar-cuadrante,
+.pantalla-activa #btn-salir-inicio {
+  display: block !important;
+}
 
 
