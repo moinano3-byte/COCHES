@@ -1479,7 +1479,7 @@ scrollActivo = false;
     limpiarSeleccion();
     td.classList.add("seleccionada");
     seleccion.add(td);
-  }, 1200);
+  }, 400);
 
 }, { passive: true });
 
