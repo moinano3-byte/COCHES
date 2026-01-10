@@ -597,5 +597,14 @@ td.seleccionada {
   transform: scale(1.05);
   transform-origin: center;
 }
+/* ===== PANTALLA CUADRANTE ===== */
+#pantalla-cuadrante {
+  display: none;
+  padding: 20px;
+}
+
+#pantalla-cuadrante.pantalla-activa {
+  display: block;
+}
 
 
