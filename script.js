@@ -1523,19 +1523,30 @@ tbody.addEventListener("touchstart", e => {
 
 /* ===================== TOUCH MOVE ===================== */
 tbody.addEventListener("touchmove", e => {
-  if (!celdaInicio) return;
-
   const touch = e.touches[0];
   const td = document.elementFromPoint(touch.clientX, touch.clientY)?.closest("td");
 
-  if (!td || !esSeleccionable(td)) return;
+  if (!td) return;
 
-  arrastrando = true;
-  seleccionarRectangulo(td);
+  // 🔹 BLOQUEAR scroll siempre que haya un td (seleccionable o no)
+  e.preventDefault(); 
 
-  // 🔹 BLOQUEAR scroll nativo mientras arrastras
-  e.preventDefault();
+  // Si no hay celda de inicio, salir
+  if (!celdaInicio) return;
+
+  // Si la celda es seleccionable, arrastrar y marcar
+  if (esSeleccionable(td)) {
+    arrastrando = true;
+    seleccionarRectangulo(td);
+  } else {
+    // Si es celda no interactiva, resetear selección
+    arrastrando = false;
+    modoSeleccionMovil = false;
+    celdaInicio = null;
+  }
+
 }, { passive: false });
+
 
 /* ===================== TOUCH END ===================== */
 tbody.addEventListener("touchend", e => {
