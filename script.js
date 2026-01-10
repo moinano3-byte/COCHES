@@ -1440,24 +1440,6 @@ tbody.addEventListener("touchstart", e => {
     modoSeleccionMovil = false;
     return;
   }
-// ==== BLOQUE PARA CANCELAR SCROLL NATIVO PERO MANTENER ZOOM ====
-document.addEventListener("touchmove", function(e) {
-  if (!arrastrando) return;  // solo cuando no arrastramos selección
-  e.preventDefault();         // bloquea scroll nativo
-}, { passive: false });
-
-// Bloquear pull-to-refresh en móviles (Chrome/Android)
-let lastTouch = 0;
-document.addEventListener("touchstart", function(e) {
-  lastTouch = e.touches[0].clientY;
-}, { passive: true });
-
-document.addEventListener("touchmove", function(e) {
-  const y = e.touches[0].clientY;
-  if (!arrastrando && document.body.scrollTop === 0 && y > lastTouch) {
-    e.preventDefault();  // pull-to-refresh
-  }
-}, { passive: false });
 
   // ✅ Inicializar referencia del dedo
   lastTouchY = e.touches[0].clientY;
