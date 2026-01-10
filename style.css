@@ -572,21 +572,26 @@ td.seleccionada {
   bottom: 40px;
   left: 50%;
   transform: translateX(-50%);
-  padding: 18px 28px;
-  font-size: 44px;
-  background: linear-gradient(135deg, #70AD47, #9BBB59);
-  color: rgb(0, 0, 0);
+  padding: 22px 36px;          /* más grande */
+  font-size: 52px;            /* más grande */
+  font-weight: 900;           /* gruesa */
+  background: #000000;        /* negro */
+  color: #319b17;             /* verde */
+    text-shadow: 0 0 6px #319b17;
 }
 
 /* BOTÓN VOLVER - ESQUINA SUPERIOR DERECHA */
 .btn-fijo.volver {
   top: 40px;
-  right: 20px;  /* Cambiado de left a right */
-  padding: 14px 18px;
-  font-size: 48px;
-  background: linear-gradient(135deg, #70AD47, #9BBB59);;
-  color: black;
+  right: 20px;
+  padding: 20px 28px;         /* más grande */
+  font-size: 54px;
+  font-weight: 900;
+  background: #000000;        /* negro */
+  color: #319b17;             /* verde */
+  text-shadow: 0 0 6px #319b17;
 }
+
 
 /* HOVER EFECTO */
 .btn-fijo:hover {
