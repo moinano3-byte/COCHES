@@ -1523,29 +1523,23 @@ tbody.addEventListener("touchstart", e => {
 
 /* ===================== TOUCH MOVE ===================== */
 tbody.addEventListener("touchmove", e => {
+  // 🔹 BLOQUEAR scroll nativo siempre que haya touch sobre tbody
+  e.preventDefault();
+
   const touch = e.touches[0];
   const td = document.elementFromPoint(touch.clientX, touch.clientY)?.closest("td");
 
+  // Si no hay celda bajo el dedo, salir
   if (!td) return;
 
-  // 🔹 BLOQUEAR scroll siempre que haya un td (seleccionable o no)
-  e.preventDefault(); 
-
-  // Si no hay celda de inicio, salir
-  if (!celdaInicio) return;
-
-  // Si la celda es seleccionable, arrastrar y marcar
-  if (esSeleccionable(td)) {
+  // Si hay celda de inicio, seleccionamos
+  if (celdaInicio) {
     arrastrando = true;
-    seleccionarRectangulo(td);
-  } else {
-    // Si es celda no interactiva, resetear selección
-    arrastrando = true;
-    modoSeleccionMovil = true;
-    celdaInicio = null;
+    seleccionarRectangulo(td); // Esto se ejecuta aunque td no sea seleccionable si quieres
   }
 
 }, { passive: false });
+
 
 
 /* ===================== TOUCH END ===================== */
