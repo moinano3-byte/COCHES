@@ -1485,7 +1485,6 @@ scrollActivo = false;
 
 
 tbody.addEventListener("touchmove", e => {
-
   if (e.touches.length !== 1) {
     limpiarSeleccion();
     celdaInicio = null;
@@ -1494,44 +1493,20 @@ tbody.addEventListener("touchmove", e => {
     return;
   }
 
-  if (!celdaInicio) return;
-
   const touch = e.touches[0];
-  const elem = document.elementFromPoint(touch.clientX, touch.clientY);
-  const td = elem?.closest("td");
+  const td = document.elementFromPoint(touch.clientX, touch.clientY)?.closest("td");
 
   // 🔹 Selección de celdas
-  if (td && esSeleccionable(td)) {
+  if (td && esSeleccionable(td) && celdaInicio) {
     arrastrando = true;
+    modoSeleccionMovil = true;
     seleccionarRectangulo(td, true);
   }
 
-// 🔹 Scroll táctil con umbral (1:1) SOLO en modo selección
-if (modoSeleccionMovil) {
-  const currentY = touch.clientY;
-  const deltaTotal = Math.abs(currentY - startY);
-
-  // Activar scroll solo tras superar umbral
-  if (!scrollActivo && deltaTotal > SCROLL_THRESHOLD) {
-    scrollActivo = true;
-    lastTouchY = currentY; // reset limpio
+  // 🔹 BLOQUEAR scroll nativo mientras se arrastra
+  if (arrastrando) {
+    e.preventDefault(); // ❌ Esto detiene el scroll nativo
   }
-
-  if (scrollActivo && lastTouchY !== null) {
-    const deltaY = lastTouchY - currentY;
-    window.scrollBy(0, deltaY * 2.5);
-    window.scrollBy({
-    top: deltaY * 2.5,
-    behavior: "auto"
-});
-
-    lastTouchY = currentY;
-    e.preventDefault();
-  }
-}
-
-
-
 }, { passive: false });
 
 
