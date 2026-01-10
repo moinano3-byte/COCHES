@@ -1433,7 +1433,6 @@ let scrollActivo = false;
 const SCROLL_THRESHOLD = 12; // px
 
 tbody.addEventListener("touchstart", e => {
-
   if (e.touches.length !== 1) {
     limpiarSeleccion();
     celdaInicio = null;
@@ -1442,9 +1441,9 @@ tbody.addEventListener("touchstart", e => {
     return;
   }
 
-  // ✅ Inicializar referencia del dedo
-  lastTouchY = e.touches[0].clientY;
-scrollActivo = false;
+  const touch = e.touches[0];
+  lastTouchY = touch.clientY;
+  scrollActivo = false;
 
   const td = e.target.closest("td");
   if (!td || !esSeleccionable(td)) return;
@@ -1454,15 +1453,14 @@ scrollActivo = false;
   modoSeleccionMovil = false;
   startScroll = window.scrollY;
 
-  // ⏱️ Pulsación larga
+  // Pulsación larga para activar selección táctil
   touchTimer = setTimeout(() => {
     modoSeleccionMovil = true;
-    startY = e.touches[0].clientY;
+    startY = touch.clientY;
     limpiarSeleccion();
     td.classList.add("seleccionada");
     seleccion.add(td);
   }, 400);
-
 }, { passive: true });
 
 
@@ -1480,19 +1478,20 @@ tbody.addEventListener("touchmove", e => {
   const touch = e.touches[0];
   const td = document.elementFromPoint(touch.clientX, touch.clientY)?.closest("td");
 
-  // 🔹 Selección de celdas
+  // Selección de celdas
   if (td && esSeleccionable(td)) {
     arrastrando = true;
-    modoSeleccionMovil = true;
     seleccionarRectangulo(td);
-    // 🔹 bloquear scroll mientras arrastra
-    e.preventDefault();
+
+    // ✅ Bloquea scroll solo durante arrastre
+    if (modoSeleccionMovil && arrastrando) {
+      e.preventDefault();
+    }
   }
-}, { passive: false }); // passive: false necesario para cancelar scroll
+}, { passive: false }); // necesario para e.preventDefault
 
 
 tbody.addEventListener("touchend", e => {
-
   clearTimeout(touchTimer);
 
   if (!modoSeleccionMovil) {
@@ -1512,9 +1511,9 @@ tbody.addEventListener("touchend", e => {
   celdaInicio = null;
   arrastrando = false;
   modoSeleccionMovil = false;
-  lastTouchY = null;   // ✅ reset correcto
-
+  lastTouchY = null;
 });
+
 
 
 botonesMovil.addEventListener("click", e => {
