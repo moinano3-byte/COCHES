@@ -1548,7 +1548,17 @@ tbody.addEventListener("touchend", e => {
   celdaInicio = null;
   arrastrando = false;
   modoSeleccionMovil = false;
+
+  // 👉 MOSTRAR BOTONES MÓVIL AL SOLTAR EL DEDO
+  if (seleccion.size > 0) {
+    actualizarBotonesMovil();
+
+    const touch = e.changedTouches[0];
+    botonesMovil.style.left = touch.clientX + "px";
+    botonesMovil.style.top  = touch.clientY + "px";
+  }
 });
+
 
 /* ===================== TOUCH CANCEL ===================== */
 tbody.addEventListener("touchcancel", e => {
