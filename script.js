@@ -1523,20 +1523,23 @@ tbody.addEventListener("touchstart", e => {
 
 /* ===================== TOUCH MOVE ===================== */
 tbody.addEventListener("touchmove", e => {
-  // 🔹 BLOQUEAR scroll nativo siempre que haya touch sobre tbody
+
+  // ✅ Si NO estamos arrastrando → dejar scroll y zoom
+  if (!modoSeleccionMovil || !celdaInicio) return;
+
+  // ❌ SOLO cuando se arrastra: bloquear scroll
   e.preventDefault();
 
   const touch = e.touches[0];
-  const td = document.elementFromPoint(touch.clientX, touch.clientY)?.closest("td");
+  const td = document.elementFromPoint(
+    touch.clientX,
+    touch.clientY
+  )?.closest("td");
 
-  // Si no hay celda bajo el dedo, salir
   if (!td) return;
 
-  // Si hay celda de inicio, seleccionamos
-  if (celdaInicio) {
-    arrastrando = true;
-    seleccionarRectangulo(td); // Esto se ejecuta aunque td no sea seleccionable si quieres
-  }
+  arrastrando = true;
+  seleccionarRectangulo(td);
 
 }, { passive: false });
 
