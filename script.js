@@ -675,7 +675,7 @@ tbody.addEventListener("click", function (e) {
   const hoy = new Date();
   hoy.setHours(0, 0, 0, 0);
 
-  const MAX_ITER = 200; // más iteraciones para ajuste fino global
+  const MAX_ITER = 200;
 
   /* ===== 1️⃣ PERSONAS ===== */
   const personas = Array.from({ length: columnasPersonas }, (_, i) => ({
@@ -685,202 +685,142 @@ tbody.addEventListener("click", function (e) {
     cochesAsignados: 0
   }));
 
-  /* ===== 2️⃣ CONTAR DÍAS ===== */
+  /* ===== 2️⃣ HISTÓRICO COMPLETO ===== */
   infoMes.filasDia.forEach(tr => {
     personas.forEach(p => {
       const td = tr.children[p.id + 1];
-     if (td.dataset.estado === "2" || td.dataset.estado === "3") {
-  p.totalDias++;
-}
-
-
-      // si hay coches acumulados de meses anteriores
+      if (td.dataset.estado === "2" || td.dataset.estado === "3") p.totalDias++;
       if (td.dataset.cochesAcumulados) {
         p.cochesAsignados += parseInt(td.dataset.cochesAcumulados, 10);
       }
     });
   });
 
- /* ===== 3️⃣ LIMPIAR COCHES ===== */
-infoMes.filasDia.forEach(tr => {
+  /* ===== 3️⃣ MATRIZ VIRTUAL DEL MES ===== */
+  const virtual = infoMes.filasDia.map(tr =>
+    personas.map(p => {
+      const td = tr.children[p.id + 1];
+      return td.dataset.estado === "3" ? 3 :
+             td.dataset.estado === "2" ? 2 : 0;
+    })
+  );
+
+  /* ===== 4️⃣ LIMPIAR CONTADORES DEL MES ===== */
   personas.forEach(p => {
-    const td = tr.children[p.id + 1];
-
-    // Solo existe M-C → vuelve a M
-if (td.dataset.estado === "3") {
-  td.dataset.estado = "2";
-  renderEstado(td);
-}
-
-
+    p.cochesAsignados = p.cochesAsignados;
   });
-});
 
-
-  /* ===== 4️⃣ ITERACIONES DE AJUSTE GLOBAL ===== */
+  /* ===== 5️⃣ ITERACIONES GLOBALES (SOLO MEMORIA) ===== */
   for (let iter = 0; iter < MAX_ITER; iter++) {
 
-    /* ===== A) REASIGNACIÓN DIARIA NORMAL ===== */
-    infoMes.filasDia.forEach((tr, idx) => {
-      const filaAnterior = idx > 0 ? infoMes.filasDia[idx - 1] : null;
-
-      const presentes = personas
-        .map(p => ({ p, td: tr.children[p.id + 1] }))
-       .filter(o =>
-  o.td.dataset.estado === "2" || o.td.dataset.estado === "3"
-);
-
-
+    /* ===== A) REPARTO GLOBAL EN SECO ===== */
+    infoMes.filasDia.forEach((tr, d) => {
+      const presentes = personas.filter(p => virtual[d][p.id] === 2 || virtual[d][p.id] === 3);
       const n = presentes.length;
       if (!n) return;
 
       let cochesHoy = n <= 5 ? 1 : n <= 10 ? 2 : n <= 15 ? 3 : Math.ceil(n / 5);
 
-      presentes.forEach(o => {
-  if (o.td.dataset.estado === "3") {
-  o.td.dataset.estado = "2";
-  renderEstado(o.td);
-  o.p.cochesAsignados--;
-}
-
-
-       
+      presentes.forEach(p => {
+        if (virtual[d][p.id] === 3) {
+          virtual[d][p.id] = 2;
+          p.cochesAsignados--;
+        }
       });
 
-      const puntosUsados = new Set();
-
+      const usados = new Set();
       const orden = presentes.sort((a, b) => {
-        const pa = a.p.totalDias ? a.p.cochesAsignados / a.p.totalDias : 0;
-        const pb = b.p.totalDias ? b.p.cochesAsignados / b.p.totalDias : 0;
-        return pa - pb || a.p.totalDias - b.p.totalDias;
+        const pa = a.totalDias ? a.cochesAsignados / a.totalDias : 0;
+        const pb = b.totalDias ? b.cochesAsignados / b.totalDias : 0;
+        return pa - pb || a.totalDias - b.totalDias;
       });
 
       let asignados = 0;
-
-      for (const o of orden) {
+      for (const p of orden) {
         if (asignados >= cochesHoy) break;
 
-        if (filaAnterior) {
-          const tdAyer = filaAnterior.children[o.p.id + 1];
-          if (tdAyer && tdAyer.dataset.estado === "3") continue;
+        if (d > 0 && virtual[d - 1][p.id] === 3) continue;
 
-        }
+        let z = p.zona;
+        if (z === "zona1" || z === "zona2") z = "zona1-2";
+        if (z !== "zona4" && usados.has(z)) continue;
 
-        let punto = o.p.zona;
-        if (punto === "zona1" || punto === "zona2") punto = "zona1-2";
-        if (punto !== "zona4" && puntosUsados.has(punto)) continue;
-
-       o.td.dataset.estado = "3";
-renderEstado(o.td);
-        o.p.cochesAsignados++;
-        puntosUsados.add(punto);
+        virtual[d][p.id] = 3;
+        p.cochesAsignados++;
+        usados.add(z);
         asignados++;
       }
     });
 
-    /* ===== B) AJUSTE FINO GLOBAL (SIMULACIÓN DE INTERCAMBIOS) ===== */
-    const mediaGlobal = personas.reduce((s, p) =>
+    /* ===== B) AJUSTE FINO GLOBAL ===== */
+    const media = personas.reduce((s, p) =>
       p.totalDias ? s + (p.cochesAsignados / p.totalDias) : s
     , 0) / personas.filter(p => p.totalDias).length;
 
-    function dispersionTotal() {
-      return personas.reduce((s, p) => {
-        if (!p.totalDias) return s;
-        return s + Math.abs((p.cochesAsignados / p.totalDias) - mediaGlobal);
-      }, 0);
-    }
+    const dispersion = () =>
+      personas.reduce((s, p) =>
+        p.totalDias ? s + Math.abs((p.cochesAsignados / p.totalDias) - media) : s
+      , 0);
 
-    let huboCambio = false;
-    let mejorDisp = dispersionTotal();
-    let mejorMovimiento = null;
+    let mejor = dispersion();
+    let cambio = null;
 
-    for (let i = 0; i < infoMes.filasDia.length; i++) {
-      const tr = infoMes.filasDia[i];
-      const filaAnterior = i > 0 ? infoMes.filasDia[i - 1] : null;
-
-      const fecha = new Date(tr.dataset.fecha);
+    for (let d = 0; d < virtual.length; d++) {
+      const fecha = new Date(infoMes.filasDia[d].dataset.fecha);
       fecha.setHours(0, 0, 0, 0);
       if (fecha <= hoy) continue;
 
       for (const pAlta of personas) {
-        const tdAlta = tr.children[pAlta.id + 1];
-       if (tdAlta.dataset.estado !== "3") continue;
-
+        if (virtual[d][pAlta.id] !== 3) continue;
 
         for (const pBaja of personas) {
-          const tdBaja = tr.children[pBaja.id + 1];
-          if (tdBaja.dataset.estado !== "2") continue;
+          if (virtual[d][pBaja.id] !== 2) continue;
 
-          // regla: no dos días seguidos
-          if (filaAnterior) {
-            const tdAyer = filaAnterior.children[pBaja.id + 1];
-            if (tdAyer && tdAyer.dataset.estado === "3") continue;
+          if (d > 0 && virtual[d - 1][pBaja.id] === 3) continue;
 
-          }
-
-          // regla de zonas
-          let zA = pAlta.zona;
-          let zB = pBaja.zona;
+          let zA = pAlta.zona, zB = pBaja.zona;
           if (zA === "zona1" || zA === "zona2") zA = "zona1-2";
           if (zB === "zona1" || zB === "zona2") zB = "zona1-2";
           if (zA === zB && zA !== "zona4") continue;
 
-          // --- SIMULACIÓN ---
           pAlta.cochesAsignados--;
           pBaja.cochesAsignados++;
 
-          const dispSimulada = dispersionTotal();
-
-          if (dispSimulada < mejorDisp) {
-            mejorDisp = dispSimulada;
-            mejorMovimiento = { tdAlta, tdBaja, pAlta, pBaja };
+          const dSim = dispersion();
+          if (dSim < mejor) {
+            mejor = dSim;
+            cambio = { d, pAlta, pBaja };
           }
 
-          // rollback simulación
           pAlta.cochesAsignados++;
           pBaja.cochesAsignados--;
         }
       }
     }
 
-    // aplicar SOLO el mejor movimiento encontrado
-    if (mejorMovimiento) {
-      const { tdAlta, tdBaja, pAlta, pBaja } = mejorMovimiento;
+    if (!cambio) break;
 
-      // alta pierde coche
-      tdAlta.dataset.estado = "2";
-tdAlta.dataset.estado = "2";
-renderEstado(tdAlta);
+    virtual[cambio.d][cambio.pAlta.id] = 2;
+    virtual[cambio.d][cambio.pBaja.id] = 3;
+    cambio.pAlta.cochesAsignados--;
+    cambio.pBaja.cochesAsignados++;
+  }
 
-
-      // baja gana coche
-tdBaja.dataset.estado = "3";
-renderEstado(tdBaja);
-
-
-
-      pAlta.cochesAsignados--;
-      pBaja.cochesAsignados++;
-
-      huboCambio = true;
-    }
-
-    if (!huboCambio) break;
-  } // cierre for MAX_ITER
-
-  /* ===== 5️⃣ TOTALES DIARIOS ===== */
-  infoMes.filasDia.forEach(tr => {
+  /* ===== 6️⃣ VOLCADO FINAL ÚNICO ===== */
+  infoMes.filasDia.forEach((tr, d) => {
     let total = 0;
     personas.forEach(p => {
-     if (tr.children[p.id + 1].dataset.estado === "3") total++;
-
+      const td = tr.children[p.id + 1];
+      td.dataset.estado = virtual[d][p.id];
+      renderEstado(td);
+      if (virtual[d][p.id] === 3) total++;
     });
     const tdCoches = tr.querySelector(".Coches");
     if (tdCoches) tdCoches.textContent = total || "";
   });
 
   recalcular();
-  console.log("✔ Convergencia global mensual real, acumulando porcentajes, sin romper reglas");
+  console.log("✔ Convergencia mensual cerrada y óptima");
 });
 
 
