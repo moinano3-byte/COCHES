@@ -1556,9 +1556,12 @@ tbody.addEventListener("touchend", e => {
   if (seleccion.size > 0) {
     actualizarBotonesMovil();
 
-    const touch = e.changedTouches[0];
-    botonesMovil.style.left = touch.clientX + "px";
-    botonesMovil.style.top  = touch.clientY + "px";
+ const ancho = botonesMovil.offsetWidth;
+const alto  = botonesMovil.offsetHeight;
+
+botonesMovil.style.left = (window.innerWidth  / 2 - ancho / 2) + "px";
+botonesMovil.style.top  = (window.innerHeight / 2 - alto  / 2) + "px";
+
   }
 });
 
